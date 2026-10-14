@@ -1,0 +1,1939 @@
+<!DOCTYPE html>
+<html lang="de" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PhysikLab Pro — Interaktive Q2 Experimente</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Inter Font as Apple SF Pro Web Equivalent -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', '-apple-system', 'BlinkMacSystemFont', 'SF Pro Display', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'ui-monospace', 'SFMono-Regular', 'monospace'],
+                    },
+                    colors: {
+                        apple: {
+                            bgLight: '#f5f5f7',
+                            bgDark: '#000000',
+                            cardLight: '#ffffff',
+                            cardDark: '#1d1d1f',
+                            cardDarkElevated: '#2c2c2e',
+                            blue: '#0071e3',
+                            blueHover: '#0077ed',
+                            textLight: '#1d1d1f',
+                            textMutedLight: '#86868b',
+                            textDark: '#f5f5f7',
+                            textMutedDark: '#a1a1a6',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* Apple-inspired Smooth Scroll & Custom Sliders */
+        body {
+            font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        /* Custom Apple-style Range Input */
+        input[type="range"] {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 100%;
+            height: 6px;
+            border-radius: 999px;
+            background: rgba(134, 134, 139, 0.25);
+            outline: none;
+            transition: background 0.2s ease;
+        }
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            background: #ffffff;
+            border: 1px solid rgba(0, 0, 0, 0.12);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.22), 0 0 1px rgba(0, 0, 0, 0.1);
+            cursor: pointer;
+            transition: transform 0.15s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.15s ease;
+        }
+        input[type="range"]::-webkit-slider-thumb:hover {
+            transform: scale(1.08);
+            box-shadow: 0 4px 12px rgba(0, 113, 227, 0.35);
+        }
+        input[type="range"]::-webkit-slider-thumb:active {
+            transform: scale(0.96);
+        }
+
+        /* Glassmorphism utilities */
+        .apple-glass {
+            backdrop-filter: saturate(180%) blur(20px);
+            -webkit-backdrop-filter: saturate(180%) blur(20px);
+        }
+
+        /* Subtle Bento Card Hover */
+        .bento-card {
+            transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .bento-card:hover {
+            transform: translateY(-2px);
+        }
+
+        /* Hide scrollbar for clean pill nav */
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+</head>
+
+<body class="bg-apple-bgLight dark:bg-apple-bgDark text-apple-textLight dark:text-apple-textDark transition-colors duration-300 min-h-screen flex flex-col selection:bg-apple-blue selection:text-white">
+
+    <!-- Top Apple Global Navigation Bar -->
+    <header class="sticky top-0 z-50 apple-glass bg-white/75 dark:bg-[#111113]/80 border-b border-black/[0.08] dark:border-white/[0.08] transition-colors duration-300">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-14 flex items-center justify-between gap-4">
+            <!-- Brand Logo -->
+            <div class="flex items-center gap-2.5 cursor-pointer" onclick="window.scrollTo({top: 0, behavior: 'smooth'})">
+                <div class="w-8 h-8 rounded-xl bg-gradient-to-br from-apple-blue to-indigo-600 flex items-center justify-center text-white shadow-sm">
+                    <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                        <circle cx="12" cy="12" r="3"/>
+                        <ellipse cx="12" cy="12" rx="10" ry="4" transform="rotate(30 12 12)"/>
+                        <ellipse cx="12" cy="12" rx="10" ry="4" transform="rotate(150 12 12)"/>
+                    </svg>
+                </div>
+                <div class="flex items-baseline gap-1.5">
+                    <span class="font-semibold tracking-tight text-base">PhysikLab</span>
+                    <span class="text-[11px] font-semibold uppercase tracking-wider px-1.5 py-0.5 rounded-md bg-black/5 dark:bg-white/10 text-apple-textMutedLight dark:text-apple-textMutedDark">Q2 Abitur</span>
+                </div>
+            </div>
+
+            <!-- Experiment Quick Switcher in Navbar (Desktop) -->
+            <nav class="hidden md:flex items-center gap-1 bg-black/[0.04] dark:bg-white/[0.06] p-1 rounded-full border border-black/[0.04] dark:border-white/[0.05]">
+                <button onclick="switchExperiment('photoeffect')" id="nav-btn-photoeffect" class="nav-pill px-3.5 py-1 rounded-full text-xs font-medium transition-all duration-200">
+                    Fotoeffekt
+                </button>
+                <button onclick="switchExperiment('diffraction')" id="nav-btn-diffraction" class="nav-pill px-3.5 py-1 rounded-full text-xs font-medium transition-all duration-200">
+                    Elektronenbeugung
+                </button>
+                <button onclick="switchExperiment('franckhertz')" id="nav-btn-franckhertz" class="nav-pill px-3.5 py-1 rounded-full text-xs font-medium transition-all duration-200">
+                    Franck-Hertz
+                </button>
+                <button onclick="switchExperiment('doubleslit')" id="nav-btn-doubleslit" class="nav-pill px-3.5 py-1 rounded-full text-xs font-medium transition-all duration-200">
+                    Doppelspalt & Quanten
+                </button>
+            </nav>
+
+            <!-- Actions: Protocol & Dark Mode -->
+            <div class="flex items-center gap-2">
+                <button onclick="toggleProtocolModal()" class="relative inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-medium bg-black/[0.05] hover:bg-black/[0.09] dark:bg-white/[0.08] dark:hover:bg-white/[0.14] transition-colors">
+                    <svg class="w-3.5 h-3.5 text-apple-blue" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                    </svg>
+                    <span>Messwerte</span>
+                    <span id="protocol-badge" class="ml-0.5 px-1.5 py-0.2 rounded-full text-[10px] font-semibold bg-apple-blue text-white">0</span>
+                </button>
+
+                <button onclick="toggleTheme()" id="theme-toggle-btn" aria-label="Darstellung wechseln" class="p-2 rounded-full bg-black/[0.05] hover:bg-black/[0.09] dark:bg-white/[0.08] dark:hover:bg-white/[0.14] transition-colors">
+                    <!-- Sun Icon (shown in dark mode) -->
+                    <svg id="icon-sun" class="w-4 h-4 hidden dark:block text-amber-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <circle cx="12" cy="12" r="5"/><path stroke-linecap="round" d="M12 1v2m0 18v2M4.22 4.22l1.42 1.42m12.72 12.72l1.42 1.42M1 12h2m18 0h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/>
+                    </svg>
+                    <!-- Moon Icon (shown in light mode) -->
+                    <svg id="icon-moon" class="w-4 h-4 block dark:hidden text-slate-700" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/>
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="pt-8 pb-6 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto w-full">
+        <div class="text-center max-w-3xl mx-auto mb-7">
+            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-apple-blue/10 text-apple-blue text-xs font-semibold tracking-wide mb-3">
+                <span class="w-2 h-2 rounded-full bg-apple-blue animate-pulse"></span>
+                Qualifikationsphase 2 • Quanten- & Atomphysik
+            </div>
+            <h1 class="text-3xl sm:text-5xl font-bold tracking-tight leading-tight">
+                Quantenphysik. <span class="bg-clip-text text-transparent bg-gradient-to-r from-apple-blue via-indigo-500 to-purple-500">Greifbar präzise.</span>
+            </h1>
+            <p class="mt-2.5 text-sm sm:text-base text-apple-textMutedLight dark:text-apple-textMutedDark max-w-2xl mx-auto font-normal">
+                Führe die vier wichtigsten Realexperimente der Oberstufe digital durch – mit Echtzeit-Simulation, abiturrelevanten Auswertungsgraphen und direkter Messwerterfassung.
+            </p>
+        </div>
+
+        <!-- 4 Bento Experiment Selector Cards -->
+        <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-6">
+            <!-- Card 1: Photoeffect -->
+            <button onclick="switchExperiment('photoeffect')" id="card-photoeffect" class="exp-card text-left p-4 rounded-2xl bg-white dark:bg-apple-cardDark border transition-all duration-200 flex flex-col justify-between group">
+                <div class="flex items-center justify-between w-full mb-2">
+                    <span class="text-[11px] font-semibold uppercase tracking-wider text-apple-blue">Versuch 01</span>
+                    <span class="w-7 h-7 rounded-full bg-apple-blue/10 text-apple-blue flex items-center justify-center">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+                    </span>
+                </div>
+                <div>
+                    <h3 class="font-semibold text-sm sm:text-base tracking-tight">Äußerer Fotoeffekt</h3>
+                    <p class="text-xs text-apple-textMutedLight dark:text-apple-textMutedDark mt-0.5 line-clamp-1">Gegenfeldmethode & $h$-Bestimmung</p>
+                </div>
+            </button>
+
+            <!-- Card 2: Electron Diffraction -->
+            <button onclick="switchExperiment('diffraction')" id="card-diffraction" class="exp-card text-left p-4 rounded-2xl bg-white dark:bg-apple-cardDark border transition-all duration-200 flex flex-col justify-between group">
+                <div class="flex items-center justify-between w-full mb-2">
+                    <span class="text-[11px] font-semibold uppercase tracking-wider text-emerald-500">Versuch 02</span>
+                    <span class="w-7 h-7 rounded-full bg-emerald-500/10 text-emerald-500 flex items-center justify-center">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1"/></svg>
+                    </span>
+                </div>
+                <div>
+                    <h3 class="font-semibold text-sm sm:text-base tracking-tight">Elektronenbeugung</h3>
+                    <p class="text-xs text-apple-textMutedLight dark:text-apple-textMutedDark mt-0.5 line-clamp-1">De-Broglie-Wellenlänge & Debye-Scherrer</p>
+                </div>
+            </button>
+
+            <!-- Card 3: Franck-Hertz -->
+            <button onclick="switchExperiment('franckhertz')" id="card-franckhertz" class="exp-card text-left p-4 rounded-2xl bg-white dark:bg-apple-cardDark border transition-all duration-200 flex flex-col justify-between group">
+                <div class="flex items-center justify-between w-full mb-2">
+                    <span class="text-[11px] font-semibold uppercase tracking-wider text-amber-500">Versuch 03</span>
+                    <span class="w-7 h-7 rounded-full bg-amber-500/10 text-amber-500 flex items-center justify-center">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 10-9.78 2.096A4.001 4.001 0 003 15z"/></svg>
+                    </span>
+                </div>
+                <div>
+                    <h3 class="font-semibold text-sm sm:text-base tracking-tight">Franck-Hertz-Versuch</h3>
+                    <p class="text-xs text-apple-textMutedLight dark:text-apple-textMutedDark mt-0.5 line-clamp-1">Diskrete Energieniveaus in Hg & Neon</p>
+                </div>
+            </button>
+
+            <!-- Card 4: Double Slit -->
+            <button onclick="switchExperiment('doubleslit')" id="card-doubleslit" class="exp-card text-left p-4 rounded-2xl bg-white dark:bg-apple-cardDark border transition-all duration-200 flex flex-col justify-between group">
+                <div class="flex items-center justify-between w-full mb-2">
+                    <span class="text-[11px] font-semibold uppercase tracking-wider text-purple-500">Versuch 04</span>
+                    <span class="w-7 h-7 rounded-full bg-purple-500/10 text-purple-500 flex items-center justify-center">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2z"/></svg>
+                    </span>
+                </div>
+                <div>
+                    <h3 class="font-semibold text-sm sm:text-base tracking-tight">Quanten-Doppelspalt</h3>
+                    <p class="text-xs text-apple-textMutedLight dark:text-apple-textMutedDark mt-0.5 line-clamp-1">Einzelphotonen & Welcher-Weg-Detektor</p>
+                </div>
+            </button>
+        </div>
+    </section>
+
+    <!-- Main Laboratory Workspace -->
+    <main class="flex-1 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-16 w-full">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+
+            <!-- Left Column: Visual Canvases & Live Telemetry (8 cols on lg) -->
+            <div class="lg:col-span-8 flex flex-col gap-5">
+                
+                <!-- Primary Experiment Canvas Card -->
+                <div class="rounded-3xl bg-white dark:bg-apple-cardDark border border-black/[0.06] dark:border-white/[0.08] shadow-sm overflow-hidden">
+                    <!-- Canvas Header Bar -->
+                    <div class="px-5 py-3.5 border-b border-black/[0.06] dark:border-white/[0.08] flex flex-wrap items-center justify-between gap-2">
+                        <div class="flex items-center gap-2.5">
+                            <div class="flex items-center gap-1.5">
+                                <span class="w-3 h-3 rounded-full bg-[#ff5f56] inline-block"></span>
+                                <span class="w-3 h-3 rounded-full bg-[#ffbd2e] inline-block"></span>
+                                <span class="w-3 h-3 rounded-full bg-[#27c93f] inline-block"></span>
+                            </div>
+                            <span id="sim-title-badge" class="ml-2 text-xs font-semibold tracking-tight text-apple-textLight dark:text-apple-textDark">
+                                Vakuum-Fotozelle • Gegenfeldmethode
+                            </span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <span id="sim-status-pill" class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-medium bg-emerald-500/10 text-emerald-600 dark:text-emerald-400">
+                                <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-ping"></span>
+                                Echtzeit-Simulation aktiv
+                            </span>
+                        </div>
+                    </div>
+
+                    <!-- High-DPI Simulation Canvas Container -->
+                    <div class="relative w-full h-[320px] sm:h-[370px] bg-[#090a0f] select-none overflow-hidden">
+                        <canvas id="simCanvas" class="w-full h-full block"></canvas>
+                    </div>
+
+                    <!-- Live Digital Readouts (Bento Telemetry Bar) -->
+                    <div id="telemetry-bar" class="grid grid-cols-2 sm:grid-cols-4 divide-y sm:divide-y-0 sm:divide-x divide-black/[0.06] dark:divide-white/[0.08] bg-apple-bgLight/50 dark:bg-[#161618]">
+                        <div class="p-3.5 px-5">
+                            <div id="tel-label-1" class="text-[11px] font-medium text-apple-textMutedLight dark:text-apple-textMutedDark">Frequenz f</div>
+                            <div id="tel-val-1" class="font-mono text-base sm:text-lg font-semibold mt-0.5">6.88 × 10¹⁴ Hz</div>
+                        </div>
+                        <div class="p-3.5 px-5">
+                            <div id="tel-label-2" class="text-[11px] font-medium text-apple-textMutedLight dark:text-apple-textMutedDark">Photonenenergie E_Ph</div>
+                            <div id="tel-val-2" class="font-mono text-base sm:text-lg font-semibold mt-0.5 text-apple-blue">2.85 eV</div>
+                        </div>
+                        <div class="p-3.5 px-5">
+                            <div id="tel-label-3" class="text-[11px] font-medium text-apple-textMutedLight dark:text-apple-textMutedDark">Max. E_kin (Elektronen)</div>
+                            <div id="tel-val-3" class="font-mono text-base sm:text-lg font-semibold mt-0.5 text-emerald-500">0.90 eV</div>
+                        </div>
+                        <div class="p-3.5 px-5">
+                            <div id="tel-label-4" class="text-[11px] font-medium text-apple-textMutedLight dark:text-apple-textMutedDark">Fotostrom I_Foto</div>
+                            <div id="tel-val-4" class="font-mono text-base sm:text-lg font-semibold mt-0.5 text-amber-500">4.25 nA</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Secondary Live Scientific Plotter Card -->
+                <div class="rounded-3xl bg-white dark:bg-apple-cardDark border border-black/[0.06] dark:border-white/[0.08] shadow-sm overflow-hidden">
+                    <div class="px-5 py-3.5 border-b border-black/[0.06] dark:border-white/[0.08] flex flex-wrap items-center justify-between gap-2">
+                        <div>
+                            <h3 id="graph-title" class="text-sm font-semibold tracking-tight">Auswertungsdiagramm: E_kin,max in Abhängigkeit der Frequenz f</h3>
+                            <p id="graph-subtitle" class="text-xs text-apple-textMutedLight dark:text-apple-textMutedDark">Steigung der Ausgleichsgeraden entspricht dem Planckschen Wirkungsquantum h</p>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <button onclick="recordDataPoint()" class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-semibold bg-apple-blue hover:bg-apple-blueHover text-white shadow-sm transition-all active:scale-95">
+                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.4" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/></svg>
+                                <span>Messpunkt aufnehmen</span>
+                            </button>
+                            <button onclick="clearCurrentExperimentPoints()" class="inline-flex items-center gap-1 px-3 py-1.5 rounded-full text-xs font-medium bg-black/[0.05] hover:bg-black/[0.09] dark:bg-white/[0.08] dark:hover:bg-white/[0.14] transition-colors">
+                                Zurücksetzen
+                            </button>
+                        </div>
+                    </div>
+                    <div class="relative w-full h-[250px] sm:h-[280px] bg-white dark:bg-[#141416]">
+                        <canvas id="graphCanvas" class="w-full h-full block"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Column: Interactive Apple Control Center & Abitur Knowledge (4 cols on lg) -->
+            <div class="lg:col-span-4 flex flex-col gap-5">
+
+                <!-- Control Panel Card -->
+                <div class="rounded-3xl bg-white dark:bg-apple-cardDark border border-black/[0.06] dark:border-white/[0.08] shadow-sm p-5 sm:p-6">
+                    <div class="flex items-center justify-between mb-5">
+                        <h2 class="text-base font-bold tracking-tight">Versuchsparameter</h2>
+                        <span class="text-[11px] font-medium px-2.5 py-0.5 rounded-full bg-black/[0.05] dark:bg-white/[0.08] text-apple-textMutedLight dark:text-apple-textMutedDark">Präzisionssteuerung</span>
+                    </div>
+
+                    <!-- CONTROLS 1: PHOTOEFFECT -->
+                    <div id="controls-photoeffect" class="space-y-5">
+                        <!-- Cathode Material Selector -->
+                        <div>
+                            <label class="block text-xs font-semibold uppercase tracking-wider text-apple-textMutedLight dark:text-apple-textMutedDark mb-2">Kathodenmaterial (Austrittsarbeit W_A)</label>
+                            <div class="grid grid-cols-2 gap-2">
+                                <button onclick="setPhotoMaterial('Cs')" id="mat-Cs" class="mat-btn px-3 py-2 rounded-xl text-xs font-medium border text-left transition-all">
+                                    <div class="font-semibold">Cäsium (Cs)</div>
+                                    <div class="text-[11px] opacity-75">W_A = 1,95 eV</div>
+                                </button>
+                                <button onclick="setPhotoMaterial('K')" id="mat-K" class="mat-btn px-3 py-2 rounded-xl text-xs font-medium border text-left transition-all">
+                                    <div class="font-semibold">Kalium (K)</div>
+                                    <div class="text-[11px] opacity-75">W_A = 2,29 eV</div>
+                                </button>
+                                <button onclick="setPhotoMaterial('Na')" id="mat-Na" class="mat-btn px-3 py-2 rounded-xl text-xs font-medium border text-left transition-all">
+                                    <div class="font-semibold">Natrium (Na)</div>
+                                    <div class="text-[11px] opacity-75">W_A = 2,36 eV</div>
+                                </button>
+                                <button onclick="setPhotoMaterial('Zn')" id="mat-Zn" class="mat-btn px-3 py-2 rounded-xl text-xs font-medium border text-left transition-all">
+                                    <div class="font-semibold">Zink (Zn)</div>
+                                    <div class="text-[11px] opacity-75">W_A = 4,33 eV</div>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Wavelength Slider + Spectral Line Presets -->
+                        <div>
+                            <div class="flex justify-between items-baseline mb-1.5">
+                                <label class="text-xs font-semibold">Wellenlänge λ des Lichts</label>
+                                <span id="lbl-photo-lambda" class="font-mono text-xs font-semibold text-apple-blue">436 nm (Blau)</span>
+                            </div>
+                            <input type="range" id="slider-photo-lambda" min="220" max="680" step="1" value="436" oninput="updatePhotoControls()">
+                            <!-- Hg Spectral Presets -->
+                            <div class="mt-2.5">
+                                <span class="text-[11px] text-apple-textMutedLight dark:text-apple-textMutedDark block mb-1.5">Hg-Dampflampe Spektrallinien:</span>
+                                <div class="flex flex-wrap gap-1.5">
+                                    <button onclick="setPhotoLambda(578)" class="px-2.5 py-1 rounded-lg text-[11px] font-medium bg-amber-500/15 text-amber-600 dark:text-amber-400 hover:bg-amber-500/25 transition">578 nm (Gelb)</button>
+                                    <button onclick="setPhotoLambda(546)" class="px-2.5 py-1 rounded-lg text-[11px] font-medium bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-500/25 transition">546 nm (Grün)</button>
+                                    <button onclick="setPhotoLambda(436)" class="px-2.5 py-1 rounded-lg text-[11px] font-medium bg-blue-500/15 text-blue-600 dark:text-blue-400 hover:bg-blue-500/25 transition">436 nm (Blau)</button>
+                                    <button onclick="setPhotoLambda(405)" class="px-2.5 py-1 rounded-lg text-[11px] font-medium bg-purple-500/15 text-purple-600 dark:text-purple-400 hover:bg-purple-500/25 transition">405 nm (Violett)</button>
+                                    <button onclick="setPhotoLambda(365)" class="px-2.5 py-1 rounded-lg text-[11px] font-medium bg-fuchsia-500/15 text-fuchsia-600 dark:text-fuchsia-400 hover:bg-fuchsia-500/25 transition">365 nm (UV)</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Stopping Voltage Slider -->
+                        <div>
+                            <div class="flex justify-between items-baseline mb-1.5">
+                                <label class="text-xs font-semibold">Gegenspannung U_g</label>
+                                <span id="lbl-photo-voltage" class="font-mono text-xs font-semibold">0.50 V</span>
+                            </div>
+                            <input type="range" id="slider-photo-voltage" min="0" max="4.5" step="0.01" value="0.50" oninput="updatePhotoControls()">
+                            <button onclick="autoMatchStoppingVoltage()" class="mt-2.5 w-full py-2 px-3 rounded-xl text-xs font-semibold bg-apple-blue/10 hover:bg-apple-blue/20 text-apple-blue transition flex items-center justify-center gap-1.5">
+                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                                U_g exakt auf Fotostrom I = 0 regeln
+                            </button>
+                        </div>
+
+                        <!-- Light Intensity Slider -->
+                        <div>
+                            <div class="flex justify-between items-baseline mb-1.5">
+                                <label class="text-xs font-semibold">Lichtintensität (Photonenrate)</label>
+                                <span id="lbl-photo-intensity" class="font-mono text-xs font-semibold">65 %</span>
+                            </div>
+                            <input type="range" id="slider-photo-intensity" min="10" max="100" step="5" value="65" oninput="updatePhotoControls()">
+                        </div>
+                    </div>
+
+                    <!-- CONTROLS 2: ELECTRON DIFFRACTION -->
+                    <div id="controls-diffraction" class="space-y-5 hidden">
+                        <div>
+                            <div class="flex justify-between items-baseline mb-1.5">
+                                <label class="text-xs font-semibold">Beschleunigungsspannung U_B</label>
+                                <span id="lbl-diff-ub" class="font-mono text-xs font-semibold text-emerald-500">3.50 kV</span>
+                            </div>
+                            <input type="range" id="slider-diff-ub" min="1.5" max="5.0" step="0.05" value="3.50" oninput="updateDiffControls()">
+                            <div class="flex justify-between text-[10px] text-apple-textMutedLight mt-1">
+                                <span>1,5 kV (große Ringe)</span>
+                                <span>5,0 kV (kleine Ringe)</span>
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-semibold uppercase tracking-wider text-apple-textMutedLight dark:text-apple-textMutedDark mb-2">Polykristallines Target (Gitterabstände)</label>
+                            <div class="p-3 rounded-2xl bg-black/[0.03] dark:bg-white/[0.04] border border-black/[0.05] dark:border-white/[0.06] space-y-1.5 text-xs">
+                                <div class="flex justify-between">
+                                    <span class="text-apple-textMutedLight dark:text-apple-textMutedDark">Material:</span>
+                                    <span class="font-semibold">Graphitfolie (Kohlenstoff)</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span class="text-apple-textMutedLight dark:text-apple-textMutedDark">Netzebene d₁ (Innenring):</span>
+                                    <span class="font-mono font-semibold text-emerald-500">213 pm</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span class="text-apple-textMutedLight dark:text-apple-textMutedDark">Netzebene d₂ (Außenring):</span>
+                                    <span class="font-mono font-semibold text-teal-400">123 pm</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span class="text-apple-textMutedLight dark:text-apple-textMutedDark">Abstand Folie–Schirm L:</span>
+                                    <span class="font-mono font-semibold">135 mm</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="flex items-center justify-between pt-1">
+                            <span class="text-xs font-medium">Digitaler Messschieber im Schirmbild</span>
+                            <button onclick="toggleDiffCaliper()" id="btn-diff-caliper" class="w-11 h-6 rounded-full bg-apple-blue transition-colors relative p-0.5">
+                                <span id="knob-diff-caliper" class="block w-5 h-5 rounded-full bg-white shadow transform translate-x-5 transition-transform"></span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- CONTROLS 3: FRANCK-HERTZ -->
+                    <div id="controls-franckhertz" class="space-y-5 hidden">
+                        <div>
+                            <label class="block text-xs font-semibold uppercase tracking-wider text-apple-textMutedLight dark:text-apple-textMutedDark mb-2">Füllgas der Röhre</label>
+                            <div class="grid grid-cols-2 gap-2">
+                                <button onclick="setFHGas('Hg')" id="fh-gas-Hg" class="fh-gas-btn px-3 py-2.5 rounded-xl text-xs font-medium border text-left transition-all">
+                                    <div class="font-semibold">Quecksilber (Hg)</div>
+                                    <div class="text-[11px] opacity-75">ΔE = 4,9 eV (UV-Linie)</div>
+                                </button>
+                                <button onclick="setFHGas('Ne')" id="fh-gas-Ne" class="fh-gas-btn px-3 py-2.5 rounded-xl text-xs font-medium border text-left transition-all">
+                                    <div class="font-semibold">Neon (Ne)</div>
+                                    <div class="text-[11px] opacity-75">ΔE ≈ 18,7 eV (Sichtbar)</div>
+                                </button>
+                            </div>
+                        </div>
+
+                        <div>
+                            <div class="flex justify-between items-baseline mb-1.5">
+                                <label class="text-xs font-semibold">Beschleunigungsspannung U₁</label>
+                                <span id="lbl-fh-u1" class="font-mono text-xs font-semibold text-amber-500">16.5 V</span>
+                            </div>
+                            <input type="range" id="slider-fh-u1" min="0" max="60" step="0.2" value="16.5" oninput="updateFHControls()">
+                        </div>
+
+                        <div>
+                            <div class="flex justify-between items-baseline mb-1.5">
+                                <label class="text-xs font-semibold">Gegenspannung U₂ (Gitter → Anode)</label>
+                                <span id="lbl-fh-u2" class="font-mono text-xs font-semibold">1.5 V</span>
+                            </div>
+                            <input type="range" id="slider-fh-u2" min="0.5" max="3.5" step="0.1" value="1.5" oninput="updateFHControls()">
+                        </div>
+
+                        <button onclick="toggleFHAutoSweep()" id="btn-fh-sweep" class="w-full py-2.5 px-4 rounded-xl text-xs font-semibold bg-amber-500/15 hover:bg-amber-500/25 text-amber-600 dark:text-amber-400 transition flex items-center justify-center gap-2">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/><path stroke-linecap="round" stroke-linejoin="round" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                            <span id="lbl-fh-sweep-btn">Automatischen Spannungs-Durchlauf starten</span>
+                        </button>
+                    </div>
+
+                    <!-- CONTROLS 4: DOUBLE SLIT QUANTUM -->
+                    <div id="controls-doubleslit" class="space-y-5 hidden">
+                        <div>
+                            <label class="block text-xs font-semibold uppercase tracking-wider text-apple-textMutedLight dark:text-apple-textMutedDark mb-2">Quantenobjekt-Quelle</label>
+                            <div class="grid grid-cols-2 gap-2">
+                                <button onclick="setDSParticle('photons')" id="ds-part-photons" class="ds-part-btn px-3 py-2 rounded-xl text-xs font-medium border text-left transition-all">
+                                    <div class="font-semibold">Laser-Photonen</div>
+                                    <div class="text-[11px] opacity-75">Optischer Doppelspalt</div>
+                                </button>
+                                <button onclick="setDSParticle('electrons')" id="ds-part-electrons" class="ds-part-btn px-3 py-2 rounded-xl text-xs font-medium border text-left transition-all">
+                                    <div class="font-semibold">Elektronenstrahl</div>
+                                    <div class="text-[11px] opacity-75">Jönsson-Versuch</div>
+                                </button>
+                            </div>
+                        </div>
+
+                        <div>
+                            <div class="flex justify-between items-baseline mb-1.5">
+                                <label class="text-xs font-semibold">Spaltabstand d</label>
+                                <span id="lbl-ds-d" class="font-mono text-xs font-semibold text-purple-500">2.00 μm</span>
+                            </div>
+                            <input type="range" id="slider-ds-d" min="1.0" max="4.0" step="0.1" value="2.0" oninput="updateDSControls()">
+                        </div>
+
+                        <div>
+                            <div class="flex justify-between items-baseline mb-1.5">
+                                <label id="lbl-ds-wave-title" class="text-xs font-semibold">Wellenlänge λ</label>
+                                <span id="lbl-ds-lambda" class="font-mono text-xs font-semibold">532 nm</span>
+                            </div>
+                            <input type="range" id="slider-ds-lambda" min="400" max="680" step="5" value="532" oninput="updateDSControls()">
+                        </div>
+
+                        <div>
+                            <div class="flex justify-between items-baseline mb-1.5">
+                                <label class="text-xs font-semibold">Detektionsrate (Teilchen / Sek.)</label>
+                                <span id="lbl-ds-rate" class="font-mono text-xs font-semibold">Hoch</span>
+                            </div>
+                            <input type="range" id="slider-ds-rate" min="1" max="50" step="1" value="20" oninput="updateDSControls()">
+                        </div>
+
+                        <!-- Which-Way Detector Toggle -->
+                        <div class="p-3.5 rounded-2xl bg-purple-500/10 border border-purple-500/20 flex items-center justify-between gap-3">
+                            <div>
+                                <div class="text-xs font-semibold text-purple-700 dark:text-purple-300">Welcher-Weg-Detektor</div>
+                                <div class="text-[11px] text-apple-textMutedLight dark:text-apple-textMutedDark">Messung am Spalt zerstört Interferenz</div>
+                            </div>
+                            <button onclick="toggleWhichWayDetector()" id="btn-ds-whichway" class="w-11 h-6 rounded-full bg-black/20 dark:bg-white/20 transition-colors relative p-0.5 shrink-0">
+                                <span id="knob-ds-whichway" class="block w-5 h-5 rounded-full bg-white shadow transform translate-x-0 transition-transform"></span>
+                            </button>
+                        </div>
+
+                        <button onclick="clearDoubleSlitScreen()" class="w-full py-2 px-3 rounded-xl text-xs font-semibold bg-black/[0.05] hover:bg-black/[0.09] dark:bg-white/[0.08] dark:hover:bg-white/[0.14] transition">
+                            Detektorschirm leeren (0 Treffer)
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Abitur-Fokus & Formelsammlung Card -->
+                <div class="rounded-3xl bg-white dark:bg-apple-cardDark border border-black/[0.06] dark:border-white/[0.08] shadow-sm p-5 sm:p-6">
+                    <div class="flex items-center gap-2 mb-3">
+                        <span class="w-6 h-6 rounded-lg bg-apple-blue/10 text-apple-blue flex items-center justify-center text-xs font-bold">ƒ</span>
+                        <h3 class="text-sm font-bold tracking-tight">Abitur-Wissen & Kernformeln</h3>
+                    </div>
+                    <div id="theory-content" class="text-xs leading-relaxed text-apple-textMutedLight dark:text-apple-textMutedDark space-y-3">
+                        <!-- Dynamically populated per experiment -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Measurement Protocol Modal (Apple Numbers Style) -->
+    <div id="protocol-modal" class="fixed inset-0 z-50 hidden items-center justify-center p-4 bg-black/40 backdrop-blur-md">
+        <div class="bg-white dark:bg-apple-cardDark border border-black/10 dark:border-white/10 rounded-3xl max-w-2xl w-full p-6 shadow-2xl overflow-hidden flex flex-col max-h-[85vh]">
+            <div class="flex items-center justify-between pb-4 border-b border-black/[0.06] dark:border-white/[0.08]">
+                <div>
+                    <h3 class="text-lg font-bold tracking-tight">Digitales Messprotokoll</h3>
+                    <p class="text-xs text-apple-textMutedLight dark:text-apple-textMutedDark">Alle erfassten Messreihen zur Übernahme ins Laborheft oder Excel/Numbers</p>
+                </div>
+                <button onclick="toggleProtocolModal()" class="p-2 rounded-full bg-black/[0.05] dark:bg-white/[0.08] hover:opacity-80">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+                </button>
+            </div>
+
+            <div class="overflow-y-auto my-4 flex-1">
+                <table class="w-full text-left border-collapse text-xs">
+                    <thead>
+                        <tr class="border-b border-black/[0.08] dark:border-white/[0.08] text-apple-textMutedLight dark:text-apple-textMutedDark uppercase text-[10px] tracking-wider">
+                            <th class="py-2.5 px-3">Experiment</th>
+                            <th class="py-2.5 px-3">Parameter 1</th>
+                            <th class="py-2.5 px-3">Parameter 2</th>
+                            <th class="py-2.5 px-3">Messgröße / Ergebnis</th>
+                        </tr>
+                    </thead>
+                    <tbody id="protocol-table-body" class="divide-y divide-black/[0.05] dark:divide-white/[0.06] font-mono">
+                        <!-- Dynamically populated -->
+                    </tbody>
+                </table>
+                <div id="protocol-empty-state" class="py-10 text-center text-xs text-apple-textMutedLight dark:text-apple-textMutedDark">
+                    Noch keine Messpunkte gespeichert. Klicke unter dem Diagramm auf „Messpunkt aufnehmen“.
+                </div>
+            </div>
+
+            <div class="pt-3 border-t border-black/[0.06] dark:border-white/[0.08] flex flex-wrap justify-between items-center gap-2">
+                <button onclick="clearAllProtocolData()" class="px-3.5 py-2 rounded-full text-xs font-medium text-red-500 hover:bg-red-500/10 transition">
+                    Alle Messwerte löschen
+                </button>
+                <div class="flex gap-2">
+                    <button onclick="copyProtocolCSV()" class="px-4 py-2 rounded-full text-xs font-semibold bg-apple-blue text-white hover:bg-apple-blueHover transition">
+                        Als CSV in Zwischenablage kopieren
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Floating Apple Toast Notification -->
+    <div id="apple-toast" class="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 pointer-events-none opacity-0 translate-y-3 transition-all duration-300 apple-glass bg-black/85 dark:bg-white/90 text-white dark:text-black px-4 py-2.5 rounded-full shadow-lg text-xs font-medium flex items-center gap-2">
+        <span class="w-2 h-2 rounded-full bg-emerald-400 dark:bg-emerald-600"></span>
+        <span id="apple-toast-text">Messpunkt gespeichert</span>
+    </div>
+
+    <script>
+        /* ============================================================================
+         * PHYSICAL CONSTANTS & GLOBAL LAB STATE
+         * ============================================================================ */
+        const CONSTANTS = {
+            h_eVs: 4.135667696e-15, // Planck constant in eV*s
+            h_Js: 6.62607015e-34,   // Planck constant in J*s
+            c: 2.99792458e8,        // Speed of light in m/s
+            e: 1.602176634e-19,     // Elementary charge in C
+            m_e: 9.1093837e-31      // Electron mass in kg
+        };
+
+        const state = {
+            currentExperiment: 'photoeffect', // 'photoeffect' | 'diffraction' | 'franckhertz' | 'doubleslit'
+            darkMode: false,
+
+            // 1. Photoeffect State
+            photo: {
+                material: 'Cs',
+                materials: {
+                    Cs: { name: 'Cäsium', W_A: 1.95, color: '#eab308' },
+                    K:  { name: 'Kalium', W_A: 2.29, color: '#a855f7' },
+                    Na: { name: 'Natrium', W_A: 2.36, color: '#f97316' },
+                    Zn: { name: 'Zink',   W_A: 4.33, color: '#64748b' }
+                },
+                lambdaNm: 436,      // Wavelength in nm
+                voltageUg: 0.50,    // Retarding voltage in V
+                intensity: 65,      // 10 - 100 %
+                photons: [],
+                electrons: [],
+                recordedPoints: [
+                    { f_14: 5.49, eKin: 0.32, lambda: 546, mat: 'Cs' },
+                    { f_14: 6.88, eKin: 0.90, lambda: 436, mat: 'Cs' },
+                    { f_14: 8.21, eKin: 1.45, lambda: 365, mat: 'Cs' }
+                ]
+            },
+
+            // 2. Electron Diffraction State
+            diffraction: {
+                voltageKV: 3.50,    // Accelerating voltage in kV (1.5 - 5.0)
+                d1_pm: 213,         // Graphite inner lattice spacing in pm
+                d2_pm: 123,         // Graphite outer lattice spacing in pm
+                L_mm: 135,          // Distance foil to screen in mm
+                R_tube_mm: 65,      // Radius of glass bulb
+                showCaliper: true,
+                beamParticles: [],
+                recordedPoints: [
+                    { u_kV: 2.50, invSqrtU: 0.0200, r1_mm: 15.8, r2_mm: 27.3, lambda_pm: 24.5 },
+                    { u_kV: 3.50, invSqrtU: 0.0169, r1_mm: 13.3, r2_mm: 23.1, lambda_pm: 20.7 },
+                    { u_kV: 4.50, invSqrtU: 0.0149, r1_mm: 11.8, r2_mm: 20.4, lambda_pm: 18.3 }
+                ]
+            },
+
+            // 3. Franck-Hertz State
+            franckhertz: {
+                gas: 'Hg',          // 'Hg' (4.9 eV) | 'Ne' (18.7 eV)
+                u1: 16.5,           // Accelerating voltage 0 - 60 V
+                u2: 1.5,            // Retarding voltage 0.5 - 3.5 V
+                autoSweep: false,
+                electrons: [],
+                recordedPoints: []
+            },
+
+            // 4. Double Slit State
+            doubleslit: {
+                particleType: 'photons', // 'photons' | 'electrons'
+                slitDistanceUm: 2.0,     // d in micrometers
+                wavelengthNm: 532,       // lambda in nm
+                rate: 20,                // particles per frame tick factor
+                whichWay: false,         // Complementarity detector
+                hits: [],                // {x, y, normX} on detector screen
+                histogram: new Array(120).fill(0),
+                flyingParticles: [],
+                recordedPoints: []
+            },
+
+            // Global Protocol Table Entries
+            protocol: []
+        };
+
+        // Convert wavelength (nm) to visible RGB hex/rgba string
+        function wavelengthToColor(wl) {
+            let r = 0, g = 0, b = 0;
+            if (wl < 380) {
+                // UV representation (violet glow)
+                r = 160; g = 70; b = 255;
+            } else if (wl >= 380 && wl < 440) {
+                r = -(wl - 440) / (440 - 380); g = 0; b = 1;
+            } else if (wl >= 440 && wl < 490) {
+                r = 0; g = (wl - 440) / (490 - 440); b = 1;
+            } else if (wl >= 490 && wl < 510) {
+                r = 0; g = 1; b = -(wl - 510) / (510 - 490);
+            } else if (wl >= 510 && wl < 580) {
+                r = (wl - 510) / (580 - 510); g = 1; b = 0;
+            } else if (wl >= 580 && wl < 645) {
+                r = 1; g = -(wl - 645) / (645 - 580); b = 0;
+            } else if (wl >= 645 && wl <= 780) {
+                r = 1; g = 0; b = 0;
+            }
+            if (wl >= 380) {
+                r = Math.round(r * 255);
+                g = Math.round(g * 255);
+                b = Math.round(b * 255);
+            }
+            return { r, g, b, css: `rgb(${r}, ${g}, ${b})` };
+        }
+
+        function getSpectralName(wl) {
+            if (wl < 380) return 'Ultraviolett (UV)';
+            if (wl < 430) return 'Violett';
+            if (wl < 490) return 'Blau';
+            if (wl < 560) return 'Grün';
+            if (wl < 590) return 'Gelb';
+            if (wl < 630) return 'Orange';
+            return 'Rot';
+        }
+
+        // Calculate Photoeffect quantities
+        function getPhotoPhysics() {
+            const f = CONSTANTS.c / (state.photo.lambdaNm * 1e-9); // Hz
+            const f_14 = f / 1e14;
+            const E_ph = CONSTANTS.h_eVs * f; // eV
+            const W_A = state.photo.materials[state.photo.material].W_A;
+            const E_kin_max = Math.max(0, E_ph - W_A);
+            const Ug = state.photo.voltageUg;
+            // Photocurrent I (in nA) proportional to intensity and remaining energy budget
+            let I_nA = 0;
+            if (E_ph > W_A && Ug < E_kin_max) {
+                const factor = Math.min(1, (E_kin_max - Ug) / Math.max(0.25, E_kin_max));
+                I_nA = (state.photo.intensity / 100) * 8.5 * Math.pow(factor, 0.75);
+            }
+            return { f, f_14, E_ph, W_A, E_kin_max, Ug, I_nA };
+        }
+
+        // Calculate Electron Diffraction quantities
+        function getDiffPhysics() {
+            const U = state.diffraction.voltageKV * 1000; // Volts
+            // de Broglie wavelength: lambda = h / sqrt(2 * m_e * e * U)
+            const lambda_m = CONSTANTS.h_Js / Math.sqrt(2 * CONSTANTS.m_e * CONSTANTS.e * U);
+            const lambda_pm = lambda_m * 1e12;
+            // Ring radii on screen: r = L * (lambda / d)
+            const r1_mm = state.diffraction.L_mm * (lambda_pm / state.diffraction.d1_pm);
+            const r2_mm = state.diffraction.L_mm * (lambda_pm / state.diffraction.d2_pm);
+            const invSqrtU = 1 / Math.sqrt(U);
+            return { U, lambda_pm, r1_mm, r2_mm, invSqrtU };
+        }
+
+        // Calculate Franck-Hertz anode current I_A(U1)
+        function computeFHCurrent(u1, u2, gas) {
+            const dE = gas === 'Hg' ? 4.9 : 18.7;
+            const contactPotential = gas === 'Hg' ? 1.8 : 2.2;
+            if (u1 <= 0.5) return 0;
+            // Space-charge envelope rising with U1, modulated by inelastic collision dips
+            const effU = Math.max(0, u1 - contactPotential);
+            const phase = effU / dE;
+            const n = Math.floor(phase);
+            const frac = phase - n;
+            // Smooth dip right after integer multiples of dE
+            const dipDepth = Math.min(0.78, 0.35 + 0.22 * u2);
+            const modulation = 1 - dipDepth * Math.exp(-Math.pow((frac - 0.12) / 0.18, 2));
+            const envelope = 0.14 * Math.pow(effU, 1.32);
+            const retardingSuppression = Math.exp(-0.18 * u2);
+            return Math.max(0, envelope * modulation * retardingSuppression);
+        }
+
+        // Calculate Double-Slit Intensity at normalized screen position u in [-1, 1]
+        function computeDoubleSlitProbability(normX) {
+            // Physical scaling so user sliders noticeably shift fringe spacing
+            const d_um = state.doubleslit.slitDistanceUm;
+            const b_um = 0.42; // Slit width in um
+            const lambda_um = state.doubleslit.wavelengthNm / 1000;
+            const sinTheta = normX * 0.35;
+
+            const alpha = (Math.PI * b_um * sinTheta) / lambda_um;
+            const beta  = (Math.PI * d_um * sinTheta) / lambda_um;
+
+            const singleSlitEnv = Math.abs(alpha) < 1e-5 ? 1 : Math.pow(Math.sin(alpha) / alpha, 2);
+
+            if (state.doubleslit.whichWay) {
+                // Complementarity: Which-way information destroys interference term cos^2(beta)
+                return singleSlitEnv;
+            }
+            return singleSlitEnv * Math.pow(Math.cos(beta), 2);
+        }
+
+        const THEORY_TEXTS = {
+            photoeffect: `
+                <p><strong class="text-apple-textLight dark:text-apple-textDark">Einsteinsche Lichtquantenhypothese:</strong> Licht besteht aus Energiequanten (Photonen) mit der Energie <span class="font-mono text-apple-blue">E = h · f</span>.</p>
+                <div class="p-3 rounded-2xl bg-black/[0.04] dark:bg-white/[0.05] font-mono text-xs text-apple-textLight dark:text-apple-textDark">
+                    E_kin,max = h · f − W_A = e · U_g
+                </div>
+                <p><strong>Abitur-Kernpunkt:</strong> Ob Elektronen ausgelöst werden, hängt <em>nur</em> von der Frequenz <span class="font-mono">f</span> (Grenzfrequenz <span class="font-mono">f_g = W_A / h</span>) ab, nicht von der Lichtintensität. Die Intensität bestimmt lediglich die Anzahl der ausgelösten Fotoelektronen (Größe des Fotostroms).</p>
+            `,
+            diffraction: `
+                <p><strong class="text-apple-textLight dark:text-apple-textDark">De-Broglie-Materiewellen:</strong> Jedem bewegten Quantenobjekt mit dem Impuls <span class="font-mono">p</span> lässt sich eine Wellenlänge zuordnen:</p>
+                <div class="p-3 rounded-2xl bg-black/[0.04] dark:bg-white/[0.05] font-mono text-xs text-emerald-600 dark:text-emerald-400">
+                    λ_deBroglie = h / p = h / √(2 · m_e · e · U_B)
+                </div>
+                <p><strong>Debye-Scherrer-Ringe:</strong> An den zufällig orientierten Mikrokristallen der Graphitfolie werden Elektronen gemäß der Bragg-Bedingung gebeugt. Mit steigender Beschleunigungsspannung <span class="font-mono">U_B</span> sinkt <span class="font-mono">λ</span> und die Ringradien <span class="font-mono">r₁, r₂ ~ 1/√U_B</span> schrumpfen.</p>
+            `,
+            franckhertz: `
+                <p><strong class="text-apple-textLight dark:text-apple-textDark">Quantisierte Energieaufnahme:</strong> Atome können durch Elektronenstöße nur ganz bestimmte, diskrete Energiebeträge <span class="font-mono">ΔE = E_n − E_1</span> aufnehmen.</p>
+                <div class="p-3 rounded-2xl bg-black/[0.04] dark:bg-white/[0.05] font-mono text-xs text-amber-600 dark:text-amber-400">
+                    ΔE_Hg = 4,9 eV (UV: 253,7 nm) &nbsp;|&nbsp; ΔE_Ne ≈ 18,7 eV
+                </div>
+                <p><strong>Beobachtung:</strong> Immer wenn die Elektronen vor dem Gitter ein Vielfaches von <span class="font-mono">ΔE</span> erreichen, geben sie ihre kinetische Energie beim unelastischen Stoß ab und schaffen es nicht mehr gegen die Bremsspannung <span class="font-mono">U₂</span> zur Auffängeranode.</p>
+            `,
+            doubleslit: `
+                <p><strong class="text-apple-textLight dark:text-apple-textDark">Welle-Teilchen-Dualismus & Komplementarität:</strong> Selbst wenn sich immer nur ein einzelnes Quantenobjekt in der Apparatur befindet, entsteht nach vielen Zufallstreffern das Interferenzmuster.</p>
+                <div class="p-3 rounded-2xl bg-black/[0.04] dark:bg-white/[0.05] font-mono text-xs text-purple-600 dark:text-purple-400">
+                    P(x) ~ |ψ₁(x) + ψ₂(x)|² &nbsp; (Superposition)
+                </div>
+                <p><strong>Welcher-Weg-Information:</strong> Sobald ein Detektor bestimmt, durch welchen Spalt das Quantenobjekt fliegt, verschwindet das Interferenzmuster zugunsten der klassischen Summe zweier Einzelspalte.</p>
+            `
+        };
+
+        function showToast(message) {
+            const toast = document.getElementById('apple-toast');
+            const text = document.getElementById('apple-toast-text');
+            text.textContent = message;
+            toast.classList.remove('opacity-0', 'translate-y-3');
+            toast.classList.add('opacity-100', 'translate-y-0');
+            clearTimeout(window._toastTimer);
+            window._toastTimer = setTimeout(() => {
+                toast.classList.remove('opacity-100', 'translate-y-0');
+                toast.classList.add('opacity-0', 'translate-y-3');
+            }, 2400);
+        }
+
+        function switchExperiment(expId) {
+            state.currentExperiment = expId;
+
+            // Update Navbar Pills & Bento Selector Cards
+            const experiments = ['photoeffect', 'diffraction', 'franckhertz', 'doubleslit'];
+            experiments.forEach(id => {
+                const navBtn = document.getElementById(`nav-btn-${id}`);
+                const cardBtn = document.getElementById(`card-${id}`);
+                const ctrlDiv = document.getElementById(`controls-${id}`);
+
+                if (id === expId) {
+                    navBtn?.classList.add('bg-white', 'dark:bg-apple-cardDarkElevated', 'shadow-sm', 'text-apple-textLight', 'dark:text-white');
+                    navBtn?.classList.remove('text-apple-textMutedLight', 'dark:text-apple-textMutedDark');
+                    cardBtn?.classList.add('border-apple-blue', 'ring-2', 'ring-apple-blue/20', 'shadow-md');
+                    cardBtn?.classList.remove('border-black/[0.06]', 'dark:border-white/[0.08]');
+                    ctrlDiv?.classList.remove('hidden');
+                } else {
+                    navBtn?.classList.remove('bg-white', 'dark:bg-apple-cardDarkElevated', 'shadow-sm', 'text-apple-textLight', 'dark:text-white');
+                    navBtn?.classList.add('text-apple-textMutedLight', 'dark:text-apple-textMutedDark');
+                    cardBtn?.classList.remove('border-apple-blue', 'ring-2', 'ring-apple-blue/20', 'shadow-md');
+                    cardBtn?.classList.add('border-black/[0.06]', 'dark:border-white/[0.08]');
+                    ctrlDiv?.classList.add('hidden');
+                }
+            });
+
+            // Update Titles and Theory
+            document.getElementById('theory-content').innerHTML = THEORY_TEXTS[expId];
+
+            if (expId === 'photoeffect') {
+                document.getElementById('sim-title-badge').textContent = 'Vakuum-Fotozelle • Gegenfeldmethode';
+                document.getElementById('graph-title').textContent = 'Auswertungsdiagramm: E_kin,max in Abhängigkeit der Frequenz f';
+                document.getElementById('graph-subtitle').textContent = 'Steigung der Geraden = Plancksches Wirkungsquantum h = 4,14 × 10⁻¹⁵ eVs';
+                updatePhotoControls();
+            } else if (expId === 'diffraction') {
+                document.getElementById('sim-title-badge').textContent = 'Elektronenbeugungsröhre • Polykristallines Graphit-Target';
+                document.getElementById('graph-title').textContent = 'Linearisierung: Ringradien r₁, r₂ in Abhängigkeit von 1 / √U_B';
+                document.getElementById('graph-subtitle').textContent = 'Ursprungsgeraden bestätigen die De-Broglie-Beziehung λ = h / p';
+                updateDiffControls();
+            } else if (expId === 'franckhertz') {
+                document.getElementById('sim-title-badge').textContent = 'Franck-Hertz-Röhre • Elektronenstoßanregung';
+                document.getElementById('graph-title').textContent = 'Franck-Hertz-Kennlinie: Auffängerstrom I_A in Abhängigkeit von U₁';
+                document.getElementById('graph-subtitle').textContent = 'Äquidistante Maxima und Minima belegen diskrete Energieniveaus der Atome';
+                updateFHControls();
+            } else if (expId === 'doubleslit') {
+                document.getElementById('sim-title-badge').textContent = 'Quanten-Doppelspalt • Einzelteilchen-Detektion';
+                document.getElementById('graph-title').textContent = 'Intensitätsverteilung I(x) & Stochastisches Histogramm auf dem Schirm';
+                document.getElementById('graph-subtitle').textContent = 'Vergleich zwischen theoretischer Wahrscheinlichkeitsdichte |ψ(x)|² und Einzel-Events';
+                updateDSControls();
+            }
+        }
+
+        // 1. Photoeffect Control Handlers
+        function setPhotoMaterial(matKey) {
+            state.photo.material = matKey;
+            ['Cs', 'K', 'Na', 'Zn'].forEach(k => {
+                const btn = document.getElementById(`mat-${k}`);
+                if (k === matKey) {
+                    btn.className = 'mat-btn px-3 py-2 rounded-xl text-xs font-medium border border-apple-blue bg-apple-blue/10 text-apple-blue text-left transition-all';
+                } else {
+                    btn.className = 'mat-btn px-3 py-2 rounded-xl text-xs font-medium border border-black/10 dark:border-white/10 text-left transition-all hover:bg-black/[0.03] dark:hover:bg-white/[0.04]';
+                }
+            });
+            updatePhotoControls();
+        }
+
+        function setPhotoLambda(nm) {
+            document.getElementById('slider-photo-lambda').value = nm;
+            updatePhotoControls();
+        }
+
+        function autoMatchStoppingVoltage() {
+            const phys = getPhotoPhysics();
+            const targetU = Number(phys.E_kin_max.toFixed(2));
+            document.getElementById('slider-photo-voltage').value = targetU;
+            updatePhotoControls();
+            showToast(targetU > 0 ? `Gegenspannung auf U_g = ${targetU.toFixed(2)} V eingestellt (I = 0)` : 'Photonenenergie unterhalb der Austrittsarbeit W_A!');
+        }
+
+        function updatePhotoControls() {
+            state.photo.lambdaNm = parseFloat(document.getElementById('slider-photo-lambda').value);
+            state.photo.voltageUg = parseFloat(document.getElementById('slider-photo-voltage').value);
+            state.photo.intensity = parseFloat(document.getElementById('slider-photo-intensity').value);
+
+            document.getElementById('lbl-photo-lambda').textContent = `${state.photo.lambdaNm} nm (${getSpectralName(state.photo.lambdaNm)})`;
+            document.getElementById('lbl-photo-voltage').textContent = `${state.photo.voltageUg.toFixed(2)} V`;
+            document.getElementById('lbl-photo-intensity').textContent = `${state.photo.intensity} %`;
+
+            if (state.currentExperiment === 'photoeffect') {
+                const p = getPhotoPhysics();
+                document.getElementById('tel-label-1').textContent = 'Frequenz f';
+                document.getElementById('tel-val-1').textContent = `${p.f_14.toFixed(2)} × 10¹⁴ Hz`;
+                document.getElementById('tel-label-2').textContent = 'Photonenenergie E_Ph';
+                document.getElementById('tel-val-2').textContent = `${p.E_ph.toFixed(2)} eV`;
+                document.getElementById('tel-label-3').textContent = 'Max. E_kin (Elektronen)';
+                document.getElementById('tel-val-3').textContent = `${p.E_kin_max.toFixed(2)} eV`;
+                document.getElementById('tel-label-4').textContent = 'Fotostrom I_Foto';
+                document.getElementById('tel-val-4').textContent = `${p.I_nA.toFixed(2)} nA`;
+            }
+        }
+
+        // 2. Diffraction Control Handlers
+        function toggleDiffCaliper() {
+            state.diffraction.showCaliper = !state.diffraction.showCaliper;
+            const btn = document.getElementById('btn-diff-caliper');
+            const knob = document.getElementById('knob-diff-caliper');
+            if (state.diffraction.showCaliper) {
+                btn.classList.add('bg-apple-blue');
+                btn.classList.remove('bg-black/20', 'dark:bg-white/20');
+                knob.classList.add('translate-x-5');
+                knob.classList.remove('translate-x-0');
+            } else {
+                btn.classList.remove('bg-apple-blue');
+                btn.classList.add('bg-black/20', 'dark:bg-white/20');
+                knob.classList.remove('translate-x-5');
+                knob.classList.add('translate-x-0');
+            }
+        }
+
+        function updateDiffControls() {
+            state.diffraction.voltageKV = parseFloat(document.getElementById('slider-diff-ub').value);
+            document.getElementById('lbl-diff-ub').textContent = `${state.diffraction.voltageKV.toFixed(2)} kV`;
+
+            if (state.currentExperiment === 'diffraction') {
+                const d = getDiffPhysics();
+                document.getElementById('tel-label-1').textContent = 'Beschleunigung U_B';
+                document.getElementById('tel-val-1').textContent = `${state.diffraction.voltageKV.toFixed(2)} kV`;
+                document.getElementById('tel-label-2').textContent = 'De-Broglie λ';
+                document.getElementById('tel-val-2').textContent = `${d.lambda_pm.toFixed(1)} pm`;
+                document.getElementById('tel-label-3').textContent = 'Innenradius r₁ (d₁)';
+                document.getElementById('tel-val-3').textContent = `${d.r1_mm.toFixed(1)} mm`;
+                document.getElementById('tel-label-4').textContent = 'Außenradius r₂ (d₂)';
+                document.getElementById('tel-val-4').textContent = `${d.r2_mm.toFixed(1)} mm`;
+            }
+        }
+
+        // 3. Franck-Hertz Control Handlers
+        function setFHGas(gas) {
+            state.franckhertz.gas = gas;
+            ['Hg', 'Ne'].forEach(g => {
+                const btn = document.getElementById(`fh-gas-${g}`);
+                if (g === gas) {
+                    btn.className = 'fh-gas-btn px-3 py-2.5 rounded-xl text-xs font-medium border border-amber-500 bg-amber-500/10 text-amber-600 dark:text-amber-400 text-left transition-all';
+                } else {
+                    btn.className = 'fh-gas-btn px-3 py-2.5 rounded-xl text-xs font-medium border border-black/10 dark:border-white/10 text-left transition-all hover:bg-black/[0.03] dark:hover:bg-white/[0.04]';
+                }
+            });
+            updateFHControls();
+        }
+
+        function toggleFHAutoSweep() {
+            state.franckhertz.autoSweep = !state.franckhertz.autoSweep;
+            const lbl = document.getElementById('lbl-fh-sweep-btn');
+            lbl.textContent = state.franckhertz.autoSweep
+                ? 'Spannungs-Durchlauf pausieren'
+                : 'Automatischen Spannungs-Durchlauf starten';
+        }
+
+        function updateFHControls() {
+            state.franckhertz.u1 = parseFloat(document.getElementById('slider-fh-u1').value);
+            state.franckhertz.u2 = parseFloat(document.getElementById('slider-fh-u2').value);
+            document.getElementById('lbl-fh-u1').textContent = `${state.franckhertz.u1.toFixed(1)} V`;
+            document.getElementById('lbl-fh-u2').textContent = `${state.franckhertz.u2.toFixed(1)} V`;
+
+            if (state.currentExperiment === 'franckhertz') {
+                const dE = state.franckhertz.gas === 'Hg' ? 4.9 : 18.7;
+                const I_A = computeFHCurrent(state.franckhertz.u1, state.franckhertz.u2, state.franckhertz.gas);
+                const layers = Math.max(0, Math.floor((state.franckhertz.u1 - 1.8) / dE));
+                document.getElementById('tel-label-1').textContent = 'Spannung U₁';
+                document.getElementById('tel-val-1').textContent = `${state.franckhertz.u1.toFixed(1)} V`;
+                document.getElementById('tel-label-2').textContent = 'Anregungsenergie ΔE';
+                document.getElementById('tel-val-2').textContent = `${dE.toFixed(1)} eV`;
+                document.getElementById('tel-label-3').textContent = 'Stoßzonen (Leuchtschichten)';
+                document.getElementById('tel-val-3').textContent = `${layers} Zonen`;
+                document.getElementById('tel-label-4').textContent = 'Auffängerstrom I_A';
+                document.getElementById('tel-val-4').textContent = `${I_A.toFixed(2)} nA`;
+            }
+        }
+
+        // 4. Double Slit Control Handlers
+        function setDSParticle(type) {
+            state.doubleslit.particleType = type;
+            ['photons', 'electrons'].forEach(t => {
+                const btn = document.getElementById(`ds-part-${t}`);
+                if (t === type) {
+                    btn.className = 'ds-part-btn px-3 py-2 rounded-xl text-xs font-medium border border-purple-500 bg-purple-500/10 text-purple-600 dark:text-purple-300 text-left transition-all';
+                } else {
+                    btn.className = 'ds-part-btn px-3 py-2 rounded-xl text-xs font-medium border border-black/10 dark:border-white/10 text-left transition-all hover:bg-black/[0.03] dark:hover:bg-white/[0.04]';
+                }
+            });
+            clearDoubleSlitScreen();
+            updateDSControls();
+        }
+
+        function toggleWhichWayDetector() {
+            state.doubleslit.whichWay = !state.doubleslit.whichWay;
+            const btn = document.getElementById('btn-ds-whichway');
+            const knob = document.getElementById('knob-ds-whichway');
+            if (state.doubleslit.whichWay) {
+                btn.classList.add('bg-purple-500');
+                btn.classList.remove('bg-black/20', 'dark:bg-white/20');
+                knob.classList.add('translate-x-5');
+                knob.classList.remove('translate-x-0');
+                showToast('Welcher-Weg-Detektor aktiv: Interferenz verschwindet!');
+            } else {
+                btn.classList.remove('bg-purple-500');
+                btn.classList.add('bg-black/20', 'dark:bg-white/20');
+                knob.classList.remove('translate-x-5');
+                knob.classList.add('translate-x-0');
+                showToast('Welcher-Weg-Detektor aus: Quanten-Superposition aktiv!');
+            }
+            clearDoubleSlitScreen();
+            updateDSControls();
+        }
+
+        function clearDoubleSlitScreen() {
+            state.doubleslit.hits = [];
+            state.doubleslit.histogram.fill(0);
+        }
+
+        function updateDSControls() {
+            const newD = parseFloat(document.getElementById('slider-ds-d').value);
+            const newLambda = parseFloat(document.getElementById('slider-ds-lambda').value);
+            if (newD !== state.doubleslit.slitDistanceUm || newLambda !== state.doubleslit.wavelengthNm) {
+                state.doubleslit.slitDistanceUm = newD;
+                state.doubleslit.wavelengthNm = newLambda;
+                clearDoubleSlitScreen();
+            }
+            state.doubleslit.rate = parseInt(document.getElementById('slider-ds-rate').value, 10);
+
+            document.getElementById('lbl-ds-d').textContent = `${state.doubleslit.slitDistanceUm.toFixed(2)} μm`;
+            if (state.doubleslit.particleType === 'photons') {
+                document.getElementById('lbl-ds-wave-title').textContent = 'Laser-Wellenlänge λ';
+                document.getElementById('lbl-ds-lambda').textContent = `${state.doubleslit.wavelengthNm} nm`;
+            } else {
+                document.getElementById('lbl-ds-wave-title').textContent = 'Effektive De-Broglie-Skala';
+                document.getElementById('lbl-ds-lambda').textContent = `${(state.doubleslit.wavelengthNm / 25).toFixed(1)} pm`;
+            }
+            document.getElementById('lbl-ds-rate').textContent = `${state.doubleslit.rate * 15} / s`;
+
+            if (state.currentExperiment === 'doubleslit') {
+                document.getElementById('tel-label-1').textContent = 'Detektierte Quanten';
+                document.getElementById('tel-val-1').textContent = `${state.doubleslit.hits.length}`;
+                document.getElementById('tel-label-2').textContent = 'Spaltabstand d';
+                document.getElementById('tel-val-2').textContent = `${state.doubleslit.slitDistanceUm.toFixed(2)} μm`;
+                document.getElementById('tel-label-3').textContent = 'Quanten-Zustand';
+                document.getElementById('tel-val-3').textContent = state.doubleslit.whichWay ? 'Teilchen (Klassisch)' : 'Superposition ψ₁+ψ₂';
+                document.getElementById('tel-label-4').textContent = 'Max. Ordnung Δs';
+                document.getElementById('tel-val-4').textContent = state.doubleslit.whichWay ? 'Keine Interferenz' : 'k · λ';
+            }
+        }
+
+        function recordDataPoint() {
+            const exp = state.currentExperiment;
+            if (exp === 'photoeffect') {
+                const p = getPhotoPhysics();
+                state.photo.recordedPoints.push({
+                    f_14: p.f_14,
+                    eKin: p.E_kin_max,
+                    lambda: state.photo.lambdaNm,
+                    mat: state.photo.material
+                });
+                state.protocol.push({
+                    exp: 'Fotoeffekt',
+                    p1: `λ = ${state.photo.lambdaNm} nm (${state.photo.material})`,
+                    p2: `f = ${p.f_14.toFixed(2)} · 10¹⁴ Hz`,
+                    res: `E_kin = ${p.E_kin_max.toFixed(2)} eV`
+                });
+            } else if (exp === 'diffraction') {
+                const d = getDiffPhysics();
+                state.diffraction.recordedPoints.push({
+                    u_kV: state.diffraction.voltageKV,
+                    invSqrtU: d.invSqrtU,
+                    r1_mm: d.r1_mm,
+                    r2_mm: d.r2_mm,
+                    lambda_pm: d.lambda_pm
+                });
+                state.protocol.push({
+                    exp: 'Elektronenbeugung',
+                    p1: `U_B = ${state.diffraction.voltageKV.toFixed(2)} kV`,
+                    p2: `λ = ${d.lambda_pm.toFixed(1)} pm`,
+                    res: `r₁ = ${d.r1_mm.toFixed(1)} mm | r₂ = ${d.r2_mm.toFixed(1)} mm`
+                });
+            } else if (exp === 'franckhertz') {
+                const I_A = computeFHCurrent(state.franckhertz.u1, state.franckhertz.u2, state.franckhertz.gas);
+                state.franckhertz.recordedPoints.push({
+                    u1: state.franckhertz.u1,
+                    iA: I_A,
+                    gas: state.franckhertz.gas
+                });
+                state.protocol.push({
+                    exp: `Franck-Hertz (${state.franckhertz.gas})`,
+                    p1: `U₁ = ${state.franckhertz.u1.toFixed(1)} V`,
+                    p2: `U₂ = ${state.franckhertz.u2.toFixed(1)} V`,
+                    res: `I_A = ${I_A.toFixed(2)} nA`
+                });
+            } else if (exp === 'doubleslit') {
+                state.protocol.push({
+                    exp: 'Quanten-Doppelspalt',
+                    p1: `d = ${state.doubleslit.slitDistanceUm.toFixed(2)} μm`,
+                    p2: `N = ${state.doubleslit.hits.length} Quanten`,
+                    res: state.doubleslit.whichWay ? 'Klassisch (Welcher-Weg)' : 'Interferenzmuster aktiv'
+                });
+            }
+
+            updateProtocolBadgeAndTable();
+            showToast('Messpunkt in Diagramm & Messprotokoll übernommen');
+        }
+
+        function clearCurrentExperimentPoints() {
+            const exp = state.currentExperiment;
+            if (exp === 'photoeffect') state.photo.recordedPoints = [];
+            if (exp === 'diffraction') state.diffraction.recordedPoints = [];
+            if (exp === 'franckhertz') state.franckhertz.recordedPoints = [];
+            if (exp === 'doubleslit') clearDoubleSlitScreen();
+            showToast('Diagramm-Messpunkte zurückgesetzt');
+        }
+
+        function updateProtocolBadgeAndTable() {
+            document.getElementById('protocol-badge').textContent = state.protocol.length;
+            const tbody = document.getElementById('protocol-table-body');
+            const empty = document.getElementById('protocol-empty-state');
+            tbody.innerHTML = '';
+
+            if (state.protocol.length === 0) {
+                empty.classList.remove('hidden');
+                return;
+            }
+            empty.classList.add('hidden');
+
+            state.protocol.forEach(row => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td class="py-2.5 px-3 font-sans font-semibold text-apple-blue">${row.exp}</td>
+                    <td class="py-2.5 px-3">${row.p1}</td>
+                    <td class="py-2.5 px-3">${row.p2}</td>
+                    <td class="py-2.5 px-3 font-semibold">${row.res}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function toggleProtocolModal() {
+            const modal = document.getElementById('protocol-modal');
+            modal.classList.toggle('hidden');
+            modal.classList.toggle('flex');
+            updateProtocolBadgeAndTable();
+        }
+
+        function clearAllProtocolData() {
+            state.protocol = [];
+            updateProtocolBadgeAndTable();
+            showToast('Messprotokoll geleert');
+        }
+
+        function copyProtocolCSV() {
+            if (state.protocol.length === 0) {
+                showToast('Keine Messwerte zum Kopieren vorhanden');
+                return;
+            }
+            const header = 'Experiment;Parameter 1;Parameter 2;Ergebnis\n';
+            const rows = state.protocol.map(r => `${r.exp};${r.p1};${r.p2};${r.res}`).join('\n');
+            const textarea = document.createElement('textarea');
+            textarea.value = header + rows;
+            document.body.appendChild(textarea);
+            textarea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textarea);
+            showToast('CSV-Tabelle in die Zwischenablage kopiert!');
+        }
+
+        const simCanvas = document.getElementById('simCanvas');
+        const simCtx = simCanvas.getContext('2d');
+        const graphCanvas = document.getElementById('graphCanvas');
+        const graphCtx = graphCanvas.getContext('2d');
+
+        function resizeCanvases() {
+            const dpr = window.devicePixelRatio || 1;
+            [simCanvas, graphCanvas].forEach(c => {
+                const rect = c.getBoundingClientRect();
+                c.width = rect.width * dpr;
+                c.height = rect.height * dpr;
+                const ctx = c.getContext('2d');
+                ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+            });
+        }
+        window.addEventListener('resize', resizeCanvases);
+
+        function renderPhotoeffectSim(w, h) {
+            const p = getPhotoPhysics();
+            const col = wavelengthToColor(state.photo.lambdaNm);
+            const matInfo = state.photo.materials[state.photo.material];
+
+            // Background subtle grid
+            simCtx.fillStyle = '#090a0f';
+            simCtx.fillRect(0, 0, w, h);
+            simCtx.strokeStyle = 'rgba(255,255,255,0.03)';
+            simCtx.lineWidth = 1;
+            for (let x = 0; x < w; x += 32) {
+                simCtx.beginPath(); simCtx.moveTo(x, 0); simCtx.lineTo(x, h); simCtx.stroke();
+            }
+            for (let y = 0; y < h; y += 32) {
+                simCtx.beginPath(); simCtx.moveTo(0, y); simCtx.lineTo(w, y); simCtx.stroke();
+            }
+
+            const cx = w * 0.52;
+            const cy = h * 0.48;
+            const tubeR = Math.min(w * 0.24, 115);
+
+            // Light Source Emitter (Top-Left)
+            const lampX = w * 0.14;
+            const lampY = h * 0.20;
+
+            // Light Cone Glow
+            const beamGrad = simCtx.createLinearGradient(lampX, lampY, cx - tubeR * 0.4, cy);
+            beamGrad.addColorStop(0, `rgba(${col.r}, ${col.g}, ${col.b}, ${0.35 * (state.photo.intensity / 100)})`);
+            beamGrad.addColorStop(1, `rgba(${col.r}, ${col.g}, ${col.b}, 0.02)`);
+            simCtx.fillStyle = beamGrad;
+            simCtx.beginPath();
+            simCtx.moveTo(lampX, lampY);
+            simCtx.lineTo(cx - tubeR * 0.48, cy - tubeR * 0.55);
+            simCtx.lineTo(cx - tubeR * 0.48, cy + tubeR * 0.55);
+            simCtx.closePath();
+            simCtx.fill();
+
+            // Evacuated Quartz Glass Bulb
+            simCtx.save();
+            simCtx.strokeStyle = 'rgba(255,255,255,0.22)';
+            simCtx.lineWidth = 2.5;
+            simCtx.fillStyle = 'rgba(255,255,255,0.02)';
+            simCtx.beginPath();
+            simCtx.arc(cx, cy, tubeR, 0, Math.PI * 2);
+            simCtx.fill();
+            simCtx.stroke();
+
+            // Photocathode (Curved Plate on Left of Tube)
+            simCtx.strokeStyle = matInfo.color;
+            simCtx.lineWidth = 6;
+            simCtx.lineCap = 'round';
+            simCtx.beginPath();
+            simCtx.arc(cx, cy, tubeR - 14, Math.PI * 0.68, Math.PI * 1.32);
+            simCtx.stroke();
+
+            // Anode Ring (Right inside Tube)
+            const anodeX = cx + tubeR * 0.52;
+            simCtx.strokeStyle = '#94a3b8';
+            simCtx.lineWidth = 5;
+            simCtx.beginPath();
+            simCtx.moveTo(anodeX, cy - 38);
+            simCtx.lineTo(anodeX, cy + 38);
+            simCtx.stroke();
+            simCtx.restore();
+
+            // Spawn & Animate Photons
+            if (Math.random() < (state.photo.intensity / 100) * 0.45) {
+                const targetY = cy + (Math.random() - 0.5) * (tubeR * 0.9);
+                const targetX = cx - Math.sqrt(Math.max(10, Math.pow(tubeR - 14, 2) - Math.pow(targetY - cy, 2)));
+                state.photo.photons.push({
+                    x: lampX,
+                    y: lampY,
+                    tx: targetX,
+                    ty: targetY,
+                    progress: 0
+                });
+            }
+
+            for (let i = state.photo.photons.length - 1; i >= 0; i--) {
+                const ph = state.photo.photons[i];
+                ph.progress += 0.032;
+                const px = ph.x + (ph.tx - ph.x) * ph.progress;
+                const py = ph.y + (ph.ty - ph.y) * ph.progress;
+
+                // Draw glowing wavy photon packet
+                simCtx.fillStyle = col.css;
+                simCtx.beginPath();
+                simCtx.arc(px, py, 3.2, 0, Math.PI * 2);
+                simCtx.fill();
+
+                if (ph.progress >= 1) {
+                    state.photo.photons.splice(i, 1);
+                    // Emit electron if E_ph > W_A
+                    if (p.E_ph > p.W_A) {
+                        // Random kinetic energy up to E_kin_max (surface + bulk electrons)
+                        const eKin = p.E_kin_max * (0.45 + 0.55 * Math.random());
+                        const v0 = Math.sqrt(eKin) * 3.1;
+                        state.photo.electrons.push({
+                            x: ph.tx + 4,
+                            y: ph.ty,
+                            vx: v0,
+                            vy: (cy - ph.ty) * 0.012,
+                            eKin
+                        });
+                    }
+                }
+            }
+
+            // Update & Draw Photoelectrons under opposing field E = U_g / d
+            const decel = (p.Ug * 0.095);
+            for (let i = state.photo.electrons.length - 1; i >= 0; i--) {
+                const el = state.photo.electrons[i];
+                el.vx -= decel;
+                el.x += el.vx;
+                el.y += el.vy;
+
+                // Draw electron
+                simCtx.fillStyle = '#38bdf8';
+                simCtx.beginPath();
+                simCtx.arc(el.x, el.y, 3.2, 0, Math.PI * 2);
+                simCtx.fill();
+
+                // Remove if reached anode or pushed back to cathode
+                if (el.x >= anodeX || el.x < cx - tubeR + 10) {
+                    state.photo.electrons.splice(i, 1);
+                }
+            }
+
+            // Draw Lamp Housing
+            simCtx.fillStyle = '#1e293b';
+            simCtx.strokeStyle = col.css;
+            simCtx.lineWidth = 2;
+            simCtx.beginPath();
+            simCtx.roundRect(lampX - 28, lampY - 18, 46, 36, 8);
+            simCtx.fill();
+            simCtx.stroke();
+            simCtx.fillStyle = '#ffffff';
+            simCtx.font = '600 11px Inter, sans-serif';
+            simCtx.fillText(`${state.photo.lambdaNm} nm`, lampX - 22, lampY + 4);
+
+            // Labels & Circuit Telemetry inside Canvas
+            simCtx.fillStyle = 'rgba(255,255,255,0.75)';
+            simCtx.font = '500 11px Inter, sans-serif';
+            simCtx.fillText(`Kathode: ${matInfo.name} (W_A = ${matInfo.W_A} eV)`, cx - tubeR, cy + tubeR + 24);
+            simCtx.fillText(`Gegenfeld U_g = ${p.Ug.toFixed(2)} V`, cx + 15, cy + tubeR + 24);
+
+            // Status Banner if E_ph < W_A
+            if (p.E_ph <= p.W_A) {
+                simCtx.fillStyle = 'rgba(239, 68, 68, 0.18)';
+                simCtx.strokeStyle = 'rgba(239, 68, 68, 0.5)';
+                simCtx.lineWidth = 1;
+                simCtx.beginPath();
+                simCtx.roundRect(w - 245, 16, 228, 34, 10);
+                simCtx.fill();
+                simCtx.stroke();
+                simCtx.fillStyle = '#fca5a5';
+                simCtx.font = '600 11px Inter, sans-serif';
+                simCtx.fillText('Kein Fotoeffekt: E_Photon < W_A', w - 230, 37);
+            }
+        }
+
+        function renderDiffractionSim(w, h) {
+            const d = getDiffPhysics();
+            simCtx.fillStyle = '#090a0f';
+            simCtx.fillRect(0, 0, w, h);
+
+            // Split view: Left = Electron Diffraction Tube Side View | Right = Luminescent Screen Front View
+            const leftCx = w * 0.28;
+            const cy = h * 0.5;
+
+            // Electron Gun & Graphite Foil (Left Side)
+            simCtx.strokeStyle = 'rgba(255,255,255,0.22)';
+            simCtx.lineWidth = 2;
+            simCtx.beginPath();
+            simCtx.roundRect(30, cy - 26, 75, 52, 8);
+            simCtx.stroke();
+
+            // Glass Bulb Cone
+            simCtx.beginPath();
+            simCtx.arc(leftCx + 45, cy, 82, 0, Math.PI * 2);
+            simCtx.stroke();
+
+            // Graphite Foil at Neck
+            const foilX = 105;
+            simCtx.strokeStyle = '#10b981';
+            simCtx.lineWidth = 4;
+            simCtx.beginPath();
+            simCtx.moveTo(foilX, cy - 22);
+            simCtx.lineTo(foilX, cy + 22);
+            simCtx.stroke();
+
+            // Electron Beam & Diffracted Cones
+            const screenEdgeX = leftCx + 123;
+            const spread1 = d.r1_mm * 1.8;
+            const spread2 = d.r2_mm * 1.8;
+
+            simCtx.strokeStyle = 'rgba(16, 185, 129, 0.75)';
+            simCtx.lineWidth = 2.2;
+            simCtx.beginPath();
+            simCtx.moveTo(45, cy);
+            simCtx.lineTo(screenEdgeX, cy);
+            simCtx.stroke();
+
+            // Diffracted cone rays
+            simCtx.strokeStyle = 'rgba(16, 185, 129, 0.35)';
+            simCtx.lineWidth = 1.5;
+            [spread1, -spread1, spread2, -spread2].forEach(sp => {
+                simCtx.beginPath();
+                simCtx.moveTo(foilX, cy);
+                simCtx.lineTo(screenEdgeX - 6, cy + sp);
+                simCtx.stroke();
+            });
+
+            simCtx.fillStyle = 'rgba(255,255,255,0.65)';
+            simCtx.font = '500 11px Inter, sans-serif';
+            simCtx.fillText('Elektronenkanone', 32, cy - 36);
+            simCtx.fillStyle = '#10b981';
+            simCtx.fillText('Graphitfolie', foilX - 24, cy + 40);
+
+            // Right Side: High-Detail Phosphor Luminescent Screen (Debye-Scherrer Rings)
+            const scrCx = w * 0.73;
+            const scrCy = h * 0.5;
+            const scrRadius = Math.min(w * 0.21, h * 0.40);
+            const scaleMmToPx = scrRadius / 36; // 36 mm max radius represented
+
+            // Dark Phosphor Sphere Backdrop
+            const bgGrad = simCtx.createRadialGradient(scrCx, scrCy, 5, scrCx, scrCy, scrRadius);
+            bgGrad.addColorStop(0, '#072418');
+            bgGrad.addColorStop(0.85, '#04120c');
+            bgGrad.addColorStop(1, '#020806');
+            simCtx.fillStyle = bgGrad;
+            simCtx.beginPath();
+            simCtx.arc(scrCx, scrCy, scrRadius, 0, Math.PI * 2);
+            simCtx.fill();
+            simCtx.strokeStyle = 'rgba(16, 185, 129, 0.35)';
+            simCtx.lineWidth = 2;
+            simCtx.stroke();
+
+            // Central Undiffracted Spot
+            const spotGrad = simCtx.createRadialGradient(scrCx, scrCy, 0, scrCx, scrCy, 14);
+            spotGrad.addColorStop(0, '#ffffff');
+            spotGrad.addColorStop(0.35, '#34d399');
+            spotGrad.addColorStop(1, 'rgba(16, 185, 129, 0)');
+            simCtx.fillStyle = spotGrad;
+            simCtx.beginPath();
+            simCtx.arc(scrCx, scrCy, 14, 0, Math.PI * 2);
+            simCtx.fill();
+
+            // Ring 1 (d1 = 213 pm)
+            const r1Px = d.r1_mm * scaleMmToPx;
+            simCtx.save();
+            simCtx.strokeStyle = '#34d399';
+            simCtx.shadowColor = '#10b981';
+            simCtx.shadowBlur = 12;
+            simCtx.lineWidth = 3.5;
+            simCtx.beginPath();
+            simCtx.arc(scrCx, scrCy, r1Px, 0, Math.PI * 2);
+            simCtx.stroke();
+
+            // Ring 2 (d2 = 123 pm)
+            const r2Px = d.r2_mm * scaleMmToPx;
+            simCtx.strokeStyle = '#2dd4bf';
+            simCtx.shadowColor = '#14b8a6';
+            simCtx.shadowBlur = 10;
+            simCtx.lineWidth = 2.6;
+            simCtx.beginPath();
+            simCtx.arc(scrCx, scrCy, r2Px, 0, Math.PI * 2);
+            simCtx.stroke();
+            simCtx.restore();
+
+            // Digital Caliper Overlay
+            if (state.diffraction.showCaliper) {
+                simCtx.strokeStyle = 'rgba(255,255,255,0.28)';
+                simCtx.lineWidth = 1;
+                simCtx.beginPath();
+                simCtx.moveTo(scrCx - scrRadius, scrCy);
+                simCtx.lineTo(scrCx + scrRadius, scrCy);
+                simCtx.stroke();
+
+                // r1 marker
+                simCtx.strokeStyle = '#fbbf24';
+                simCtx.beginPath();
+                simCtx.moveTo(scrCx + r1Px, scrCy - 18);
+                simCtx.lineTo(scrCx + r1Px, scrCy + 18);
+                simCtx.stroke();
+                simCtx.fillStyle = '#fbbf24';
+                simCtx.font = '600 10px JetBrains Mono, monospace';
+                simCtx.fillText(`r₁=${d.r1_mm.toFixed(1)}mm`, scrCx + r1Px - 28, scrCy - 24);
+
+                // r2 marker
+                simCtx.strokeStyle = '#38bdf8';
+                simCtx.beginPath();
+                simCtx.moveTo(scrCx - r2Px, scrCy - 18);
+                simCtx.lineTo(scrCx - r2Px, scrCy + 18);
+                simCtx.stroke();
+                simCtx.fillStyle = '#38bdf8';
+                simCtx.fillText(`r₂=${d.r2_mm.toFixed(1)}mm`, scrCx - r2Px - 28, scrCy + 32);
+            }
+
+            simCtx.fillStyle = 'rgba(255,255,255,0.75)';
+            simCtx.font = '600 11px Inter, sans-serif';
+            simCtx.fillText('Fluoreszenzschirm (Debye-Scherrer-Ringe)', scrCx - 115, scrCy + scrRadius + 22);
+        }
+
+        function renderFranckHertzSim(w, h) {
+            // Handle auto-sweep if active
+            if (state.franckhertz.autoSweep) {
+                state.franckhertz.u1 += 0.12;
+                if (state.franckhertz.u1 > 60) state.franckhertz.u1 = 0;
+                document.getElementById('slider-fh-u1').value = state.franckhertz.u1;
+                updateFHControls();
+            }
+
+            simCtx.fillStyle = '#090a0f';
+            simCtx.fillRect(0, 0, w, h);
+
+            const gas = state.franckhertz.gas;
+            const dE = gas === 'Hg' ? 4.9 : 18.7;
+            const u1 = state.franckhertz.u1;
+            const u2 = state.franckhertz.u2;
+
+            // Tube Dimensions
+            const tx = w * 0.12;
+            const tw = w * 0.76;
+            const ty = h * 0.22;
+            const th = h * 0.54;
+            const cathodeX = tx + 36;
+            const gridX = tx + tw - 75;
+            const anodeX = tx + tw - 28;
+
+            // Glass Envelope
+            simCtx.fillStyle = gas === 'Hg' ? 'rgba(56, 189, 248, 0.03)' : 'rgba(251, 146, 60, 0.03)';
+            simCtx.strokeStyle = 'rgba(255, 255, 255, 0.25)';
+            simCtx.lineWidth = 2.5;
+            simCtx.beginPath();
+            simCtx.roundRect(tx, ty, tw, th, 28);
+            simCtx.fill();
+            simCtx.stroke();
+
+            // Draw Glowing Excitation Layers (where E_kin reaches multiples of dE)
+            const effU = Math.max(0, u1 - 1.8);
+            const numLayers = Math.floor(effU / dE);
+            for (let k = 1; k <= numLayers; k++) {
+                const fracPos = (k * dE) / Math.max(dE, effU);
+                const layerX = cathodeX + (gridX - cathodeX) * Math.min(0.97, fracPos);
+                const glowColor = gas === 'Hg' ? 'rgba(168, 85, 247, 0.55)' : 'rgba(249, 115, 22, 0.72)';
+                const grad = simCtx.createLinearGradient(layerX - 18, 0, layerX + 18, 0);
+                grad.addColorStop(0, 'rgba(0,0,0,0)');
+                grad.addColorStop(0.5, glowColor);
+                grad.addColorStop(1, 'rgba(0,0,0,0)');
+                simCtx.fillStyle = grad;
+                simCtx.fillRect(layerX - 18, ty + 6, 36, th - 12);
+
+                simCtx.fillStyle = gas === 'Hg' ? '#d8b4fe' : '#fdba74';
+                simCtx.font = '600 10px JetBrains Mono, monospace';
+                simCtx.fillText(`${k}·ΔE`, layerX - 12, ty - 8);
+            }
+
+            // Draw Electrodes: Cathode K, Grid G2, Collector Anode A
+            // Cathode
+            simCtx.strokeStyle = '#f97316';
+            simCtx.lineWidth = 4;
+            simCtx.beginPath();
+            simCtx.moveTo(cathodeX, ty + 24);
+            simCtx.lineTo(cathodeX, ty + th - 24);
+            simCtx.stroke();
+
+            // Acceleration Grid G2 (dashed)
+            simCtx.strokeStyle = '#fbbf24';
+            simCtx.lineWidth = 2.5;
+            simCtx.setLineDash([6, 6]);
+            simCtx.beginPath();
+            simCtx.moveTo(gridX, ty + 16);
+            simCtx.lineTo(gridX, ty + th - 16);
+            simCtx.stroke();
+            simCtx.setLineDash([]);
+
+            // Collector Anode A
+            simCtx.strokeStyle = '#94a3b8';
+            simCtx.lineWidth = 5;
+            simCtx.beginPath();
+            simCtx.moveTo(anodeX, ty + 24);
+            simCtx.lineTo(anodeX, ty + th - 24);
+            simCtx.stroke();
+
+            // Spawn & Animate Thermal Electrons
+            if (Math.random() < 0.45 && u1 > 0.5) {
+                state.franckhertz.electrons.push({
+                    x: cathodeX + 4,
+                    y: ty + 28 + Math.random() * (th - 56),
+                    energy: 0
+                });
+            }
+
+            for (let i = state.franckhertz.electrons.length - 1; i >= 0; i--) {
+                const el = state.franckhertz.electrons[i];
+                const stepX = 2.6 + (u1 / 25);
+                el.x += stepX;
+
+                if (el.x < gridX) {
+                    const dU = (stepX / (gridX - cathodeX)) * Math.max(0, u1 - 1.8);
+                    el.energy += dU;
+                    if (el.energy >= dE) {
+                        el.energy -= dE; // Inelastic collision with Hg/Ne atom!
+                    }
+                } else {
+                    // Retarding zone between Grid and Anode
+                    el.energy -= (stepX / (anodeX - gridX)) * u2;
+                }
+
+                simCtx.fillStyle = el.energy > 1.5 ? '#38bdf8' : '#64748b';
+                simCtx.beginPath();
+                simCtx.arc(el.x, el.y, 2.8, 0, Math.PI * 2);
+                simCtx.fill();
+
+                if (el.x >= anodeX || (el.x > gridX && el.energy <= 0)) {
+                    state.franckhertz.electrons.splice(i, 1);
+                }
+            }
+
+            // Electrode Labels
+            simCtx.fillStyle = 'rgba(255,255,255,0.8)';
+            simCtx.font = '600 11px Inter, sans-serif';
+            simCtx.fillText('Kathode K', cathodeX - 20, ty + th + 22);
+            simCtx.fillText(`Gitter G₂ (+${u1.toFixed(1)} V)`, gridX - 48, ty + th + 22);
+            simCtx.fillText(`Anode A (−${u2.toFixed(1)} V)`, anodeX - 20, ty + th + 40);
+        }
+
+        function renderDoubleSlitSim(w, h) {
+            simCtx.fillStyle = '#090a0f';
+            simCtx.fillRect(0, 0, w, h);
+
+            // Generate new stochastic quantum hits using rejection sampling
+            const hitsPerFrame = Math.ceil(state.doubleslit.rate / 4);
+            for (let k = 0; k < hitsPerFrame; k++) {
+                if (state.doubleslit.hits.length < 4500) {
+                    const candX = (Math.random() * 2) - 1; // [-1, 1]
+                    const prob = computeDoubleSlitProbability(candX);
+                    if (Math.random() < prob) {
+                        const candY = (Math.random() * 2) - 1;
+                        state.doubleslit.hits.push({ normX: candX, normY: candY });
+                        const bin = Math.min(119, Math.max(0, Math.floor(((candX + 1) / 2) * 120)));
+                        state.doubleslit.histogram[bin]++;
+                    }
+                }
+            }
+
+            const col = state.doubleslit.particleType === 'photons'
+                ? wavelengthToColor(state.doubleslit.wavelengthNm)
+                : { r: 56, g: 189, b: 248, css: '#38bdf8' };
+
+            // Top Half: Schematic Wave/Particle Double Slit Setup
+            const topH = h * 0.42;
+            const slitY = topH * 0.52;
+            const cx = w * 0.5;
+            const slitGapPx = state.doubleslit.slitDistanceUm * 16;
+
+            // Barrier with two slits
+            simCtx.strokeStyle = '#64748b';
+            simCtx.lineWidth = 4;
+            simCtx.beginPath();
+            simCtx.moveTo(w * 0.15, slitY);
+            simCtx.lineTo(cx - slitGapPx / 2 - 8, slitY);
+            simCtx.moveTo(cx - slitGapPx / 2 + 8, slitY);
+            simCtx.lineTo(cx + slitGapPx / 2 - 8, slitY);
+            simCtx.moveTo(cx + slitGapPx / 2 + 8, slitY);
+            simCtx.lineTo(w * 0.85, slitY);
+            simCtx.stroke();
+
+            // Wavefronts or Which-Way Detector Icons
+            const phaseOffset = (performance.now() * 0.04) % 14;
+            simCtx.strokeStyle = `rgba(${col.r}, ${col.g}, ${col.b}, 0.28)`;
+            simCtx.lineWidth = 1.5;
+            for (let r = phaseOffset; r < 95; r += 14) {
+                simCtx.beginPath();
+                simCtx.arc(cx - slitGapPx / 2, slitY, r, 0.15 * Math.PI, 0.85 * Math.PI);
+                simCtx.stroke();
+                simCtx.beginPath();
+                simCtx.arc(cx + slitGapPx / 2, slitY, r, 0.15 * Math.PI, 0.85 * Math.PI);
+                simCtx.stroke();
+            }
+
+            if (state.doubleslit.whichWay) {
+                simCtx.fillStyle = '#f43f5e';
+                simCtx.font = '600 10px Inter, sans-serif';
+                simCtx.fillText('👁 Welcher-Weg-Sensor aktiv', cx + slitGapPx / 2 + 16, slitY - 6);
+            }
+
+            // Bottom Half: High-Contrast Detector Screen with Individual Quantum Hits
+            const scrX = w * 0.08;
+            const scrW = w * 0.84;
+            const scrY = h * 0.48;
+            const scrH = h * 0.42;
+
+            simCtx.fillStyle = '#040508';
+            simCtx.strokeStyle = 'rgba(255,255,255,0.18)';
+            simCtx.lineWidth = 1.5;
+            simCtx.beginPath();
+            simCtx.roundRect(scrX, scrY, scrW, scrH, 12);
+            simCtx.fill();
+            simCtx.stroke();
+
+            // Render accumulated quantum impacts
+            simCtx.fillStyle = `rgba(${col.r}, ${col.g}, ${col.b}, 0.82)`;
+            for (let i = 0; i < state.doubleslit.hits.length; i++) {
+                const hit = state.doubleslit.hits[i];
+                const hx = scrX + ((hit.normX + 1) * 0.5) * scrW;
+                const hy = scrY + 8 + ((hit.normY + 1) * 0.5) * (scrH - 16);
+                simCtx.fillRect(hx, hy, 2, 2);
+            }
+
+            simCtx.fillStyle = 'rgba(255,255,255,0.7)';
+            simCtx.font = '500 11px Inter, sans-serif';
+            simCtx.fillText(`Detektorschirm: N = ${state.doubleslit.hits.length} Einzel-Ereignisse`, scrX + 10, scrY - 8);
+        }
+
+        function renderGraph(w, h) {
+            const isDark = document.documentElement.classList.contains('dark');
+            graphCtx.clearRect(0, 0, w, h);
+
+            const padL = 54, padR = 26, padT = 22, padB = 38;
+            const gw = w - padL - padR;
+            const gh = h - padT - padB;
+
+            // Grid & Axes Styling
+            const axisColor = isDark ? 'rgba(255,255,255,0.22)' : 'rgba(0,0,0,0.18)';
+            const gridColor = isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.05)';
+            const textColor = isDark ? '#a1a1a6' : '#86868b';
+
+            graphCtx.strokeStyle = gridColor;
+            graphCtx.lineWidth = 1;
+            for (let i = 1; i <= 4; i++) {
+                const gy = padT + (gh / 4) * i;
+                graphCtx.beginPath(); graphCtx.moveTo(padL, gy); graphCtx.lineTo(padL + gw, gy); graphCtx.stroke();
+            }
+
+            graphCtx.strokeStyle = axisColor;
+            graphCtx.lineWidth = 1.5;
+            graphCtx.beginPath();
+            graphCtx.moveTo(padL, padT);
+            graphCtx.lineTo(padL, padT + gh);
+            graphCtx.lineTo(padL + gw, padT + gh);
+            graphCtx.stroke();
+
+            graphCtx.fillStyle = textColor;
+            graphCtx.font = '500 11px Inter, sans-serif';
+
+            const exp = state.currentExperiment;
+
+            // GRAPH 1: PHOTOEFFECT E_kin(f)
+            if (exp === 'photoeffect') {
+                const fMax = 14; // 10^14 Hz
+                const eMax = 4.0; // eV
+                const W_A = state.photo.materials[state.photo.material].W_A;
+
+                // Theoretical Planck line for current cathode material
+                graphCtx.strokeStyle = '#0071e3';
+                graphCtx.lineWidth = 2.2;
+                graphCtx.beginPath();
+                const f0 = W_A / (CONSTANTS.h_eVs * 1e14);
+                const xStart = padL + (f0 / fMax) * gw;
+                const yStart = padT + gh;
+                const eEnd = CONSTANTS.h_eVs * (fMax * 1e14) - W_A;
+                const xEnd = padL + gw;
+                const yEnd = padT + gh - (eEnd / eMax) * gh;
+                graphCtx.moveTo(xStart, yStart);
+                graphCtx.lineTo(xEnd, yEnd);
+                graphCtx.stroke();
+
+                // Current Operating Point
+                const p = getPhotoPhysics();
+                const curX = padL + (p.f_14 / fMax) * gw;
+                const curY = padT + gh - (p.E_kin_max / eMax) * gh;
+                graphCtx.fillStyle = '#10b981';
+                graphCtx.beginPath();
+                graphCtx.arc(curX, curY, 5.5, 0, Math.PI * 2);
+                graphCtx.fill();
+
+                // Recorded Points
+                graphCtx.fillStyle = '#0071e3';
+                state.photo.recordedPoints.forEach(pt => {
+                    const px = padL + (pt.f_14 / fMax) * gw;
+                    const py = padT + gh - (pt.eKin / eMax) * gh;
+                    graphCtx.beginPath();
+                    graphCtx.arc(px, py, 4, 0, Math.PI * 2);
+                    graphCtx.fill();
+                });
+
+                graphCtx.fillStyle = textColor;
+                graphCtx.fillText('Frequenz f in 10¹⁴ Hz →', padL + gw - 135, padT + gh + 28);
+                graphCtx.fillText(`f_Grenz = ${f0.toFixed(2)}`, Math.max(padL + 4, xStart - 25), padT + gh + 16);
+                graphCtx.fillText('E_kin (eV)', 6, padT + 12);
+            }
+
+            // GRAPH 2: DIFFRACTION r(1/sqrt(U))
+            else if (exp === 'diffraction') {
+                const maxInv = 0.028;
+                const maxR = 35;
+
+                // Theoretical straight lines through origin for r1 and r2
+                [
+                    { d_pm: state.diffraction.d1_pm, color: '#10b981', label: 'r₁ (d₁ = 213 pm)' },
+                    { d_pm: state.diffraction.d2_pm, color: '#14b8a6', label: 'r₂ (d₂ = 123 pm)' }
+                ].forEach(ring => {
+                    graphCtx.strokeStyle = ring.color;
+                    graphCtx.lineWidth = 2;
+                    graphCtx.beginPath();
+                    graphCtx.moveTo(padL, padT + gh);
+                    const rAtMax = state.diffraction.L_mm * ((CONSTANTS.h_Js * 1e12 / Math.sqrt(2 * CONSTANTS.m_e * CONSTANTS.e)) * maxInv / ring.d_pm);
+                    graphCtx.lineTo(padL + gw, padT + gh - (rAtMax / maxR) * gh);
+                    graphCtx.stroke();
+                });
+
+                // Current Operating Point
+                const d = getDiffPhysics();
+                const cx = padL + (d.invSqrtU / maxInv) * gw;
+                const cy1 = padT + gh - (d.r1_mm / maxR) * gh;
+                const cy2 = padT + gh - (d.r2_mm / maxR) * gh;
+                graphCtx.fillStyle = '#fbbf24';
+                graphCtx.beginPath(); graphCtx.arc(cx, cy1, 5, 0, Math.PI * 2); graphCtx.fill();
+                graphCtx.beginPath(); graphCtx.arc(cx, cy2, 5, 0, Math.PI * 2); graphCtx.fill();
+
+                graphCtx.fillStyle = textColor;
+                graphCtx.fillText('1 / √U_B in V⁻¹/² →', padL + gw - 115, padT + gh + 28);
+                graphCtx.fillText('r (mm)', 8, padT + 12);
+            }
+
+            // GRAPH 3: FRANCK-HERTZ I_A(U1)
+            else if (exp === 'franckhertz') {
+                const uMax = 60;
+                const iMax = 25;
+
+                graphCtx.strokeStyle = '#f59e0b';
+                graphCtx.lineWidth = 2.4;
+                graphCtx.beginPath();
+                for (let u = 0; u <= uMax; u += 0.25) {
+                    const iVal = computeFHCurrent(u, state.franckhertz.u2, state.franckhertz.gas);
+                    const px = padL + (u / uMax) * gw;
+                    const py = padT + gh - Math.min(gh, (iVal / iMax) * gh);
+                    if (u === 0) graphCtx.moveTo(px, py);
+                    else graphCtx.lineTo(px, py);
+                }
+                graphCtx.stroke();
+
+                // Active U1 Cursor
+                const curI = computeFHCurrent(state.franckhertz.u1, state.franckhertz.u2, state.franckhertz.gas);
+                const cx = padL + (state.franckhertz.u1 / uMax) * gw;
+                const cy = padT + gh - Math.min(gh, (curI / iMax) * gh);
+                graphCtx.fillStyle = '#ef4444';
+                graphCtx.beginPath();
+                graphCtx.arc(cx, cy, 5.5, 0, Math.PI * 2);
+                graphCtx.fill();
+
+                graphCtx.fillStyle = textColor;
+                graphCtx.fillText('Beschleunigungsspannung U₁ in V →', padL + gw - 185, padT + gh + 28);
+                graphCtx.fillText('I_A (nA)', 6, padT + 12);
+            }
+
+            // GRAPH 4: DOUBLE SLIT HISTOGRAM & |psi(x)|^2
+            else if (exp === 'doubleslit') {
+                const maxBin = Math.max(12, ...state.doubleslit.histogram);
+                const binW = gw / 120;
+
+                // Draw Measured Single-Quantum Histogram Bars
+                graphCtx.fillStyle = 'rgba(168, 85, 247, 0.35)';
+                for (let b = 0; b < 120; b++) {
+                    const bh = (state.doubleslit.histogram[b] / maxBin) * (gh * 0.9);
+                    graphCtx.fillRect(padL + b * binW, padT + gh - bh, Math.max(1, binW - 1), bh);
+                }
+
+                // Draw Theoretical Wave Probability Curve I(x)
+                graphCtx.strokeStyle = '#a855f7';
+                graphCtx.lineWidth = 2.2;
+                graphCtx.beginPath();
+                for (let px = 0; px <= gw; px += 2) {
+                    const normX = (px / gw) * 2 - 1;
+                    const prob = computeDoubleSlitProbability(normX);
+                    const py = padT + gh - prob * (gh * 0.92);
+                    if (px === 0) graphCtx.moveTo(padL + px, py);
+                    else graphCtx.lineTo(padL + px, py);
+                }
+                graphCtx.stroke();
+
+                graphCtx.fillStyle = textColor;
+                graphCtx.fillText('Schirmkoordinate x →', padL + gw - 125, padT + gh + 28);
+                graphCtx.fillText('|ψ(x)|²', 8, padT + 12);
+            }
+        }
+
+        function toggleTheme() {
+            document.documentElement.classList.toggle('dark');
+        }
+
+        function animateLoop() {
+            const simRect = simCanvas.getBoundingClientRect();
+            const graphRect = graphCanvas.getBoundingClientRect();
+
+            if (state.currentExperiment === 'photoeffect') {
+                renderPhotoeffectSim(simRect.width, simRect.height);
+            } else if (state.currentExperiment === 'diffraction') {
+                renderDiffractionSim(simRect.width, simRect.height);
+            } else if (state.currentExperiment === 'franckhertz') {
+                renderFranckHertzSim(simRect.width, simRect.height);
+            } else if (state.currentExperiment === 'doubleslit') {
+                renderDoubleSlitSim(simRect.width, simRect.height);
+                updateDSControls();
+            }
+
+            renderGraph(graphRect.width, graphRect.height);
+            requestAnimationFrame(animateLoop);
+        }
+
+        window.onload = function () {
+            resizeCanvases();
+            setPhotoMaterial('Cs');
+            setFHGas('Hg');
+            setDSParticle('photons');
+            switchExperiment('photoeffect');
+            animateLoop();
+        };
+    </script>
+</body>
+</html>
